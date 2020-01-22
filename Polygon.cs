@@ -42,21 +42,6 @@ namespace WindowsFormsApp1
 
         public static Vector Normal(Vector v) => new Vector(v.Y, -v.X);
     }
-
-    //public class Segment
-    //{
-    //    private Vector p0, p1, dir;
-    //    public Segment(Vector start, Vector end)
-    //    {
-    //        p0 = start;
-    //        p1 = end;
-    //        dir = end - start;
-    //    }
-
-    //    public Vector P0 { get => p0; set => p0 = value; }
-    //    public Vector P1 { get => p1; set => p1 = value; }
-    //    public Vector Dir { get => dir; set => dir = value; }
-    //}
     
     // Assumption: Simply connected => chain vertices together
     public class Polygon 
@@ -105,17 +90,6 @@ namespace WindowsFormsApp1
             return new double[] { min, max };
         }
 
-        //bool IsContaining(double n, double[] range)
-        //{
-        //    if (range[1] < range[0])
-        //    {
-        //        var temp = range[0];
-        //        range[0] = range[1];
-        //        range[1] = temp; 
-        //    }
-        //    return (n >= range[0] && n <= range[1]);
-        //}
-
         bool IsOverlap(double[] a_, double[] b_)
         {
             if (a_[1] < a_[0])
@@ -133,23 +107,22 @@ namespace WindowsFormsApp1
             }
 
             return !(a_[0] > b_[1] || b_[0] > a_[1]);
-            //if (IsContaining(a_[0], b_)) return true;
-            //if (IsContaining(a_[1], b_)) return true;
-            //if (IsContaining(b_[0], a_)) return true;
-            //if (IsContaining(b_[1], a_)) return true;
-            //return false;
         }
 
         public bool IsCover(Polygon b)
         {
             for (int i = 0; i < n; i++)
             {
-                Vector axis = edges[i]; // Get the direction vector
-                axis = Vector.Normal(axis); // Get the normal of the vector (90 degrees)
-                double[] a_ = Project(axis), b_ = b.Project(axis); // Find the projection of a and b onto axis
+                // Get the direction vector
+                Vector axis = edges[i];
+                // Get the normal of the vector (90 degrees)
+                axis = Vector.Normal(axis);
+                // Find the projection of a and b onto axis
+                double[] a_ = Project(axis), b_ = b.Project(axis);
+                // If they do not overlap, then no collision
                 if (!IsOverlap(a_, b_))
                 {
-                    return false; // If they do not overlap, then no collision
+                    return false;
                 }
             }
             

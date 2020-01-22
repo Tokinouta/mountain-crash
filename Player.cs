@@ -381,9 +381,9 @@ namespace WindowsFormsApp1
         public void CollapsedMountain(Mountain mountain)
         {
             Random random = new Random(Guid.NewGuid().GetHashCode());
-            bool f = polygon.IsCover(mountain.Polygon);
-            playerLabel.Text = $"{PlayerName} {combatForceLevel} {f.ToString()}";
-            if (f)
+            bool isCollapsed = polygon.IsCover(mountain.Polygon);
+            playerLabel.Text = $"{PlayerName} {combatForceLevel} {isCollapsed.ToString()}";
+            if (isCollapsed)
             {
                 //MessageBox.Show("collapsed");
                 int temp = random.Next(2, 4);
@@ -410,94 +410,21 @@ namespace WindowsFormsApp1
                         Vector newSpeed = oldSpeed - 2 * (oldSpeed * mountain.Normal) * mountain.Normal;
                         speedOfX = Convert.ToInt32(newSpeed.X);
                         speedOfY = Convert.ToInt32(newSpeed.Y);
-                        //double tempx = speedOfX, tempy = speedOfY;
-                        //if ((mountain.EndPoint.X - mountain.StartPoint.X) * speedOfX + (mountain.StartPoint.Y - mountain.EndPoint.Y) * speedOfY <= 0)
-                        //{
-                        //    speedOfX = Convert.ToInt32(tempx - 2 * (mountain.EndPoint.X - mountain.StartPoint.X)
-                        //                                        * ((mountain.StartPoint.Y - mountain.EndPoint.Y) * tempy + (mountain.EndPoint.X - mountain.StartPoint.X) * tempx)
-                        //                                        / Math.Pow(mountain.Length, 2));
-                        //    speedOfY = Convert.ToInt32(tempy - 2 * (mountain.StartPoint.Y - mountain.EndPoint.Y)
-                        //                                        * ((mountain.StartPoint.Y - mountain.EndPoint.Y) * tempy + (mountain.EndPoint.X - mountain.StartPoint.X) * tempx)
-                        //                                        / Math.Pow(mountain.Length, 2));
-                        //}
-                        //else
-                        //{
-                        //    speedOfX = Convert.ToInt32(tempx - 2 * (mountain.StartPoint.X - mountain.EndPoint.X)
-                        //                                        * ((mountain.EndPoint.Y - mountain.StartPoint.Y) * tempy + (mountain.StartPoint.X - mountain.EndPoint.X) * tempx)
-                        //                                        / Math.Pow(mountain.Length, 2));
-                        //    speedOfY = Convert.ToInt32(tempy - 2 * (mountain.EndPoint.Y - mountain.StartPoint.Y)
-                        //                                        * ((mountain.EndPoint.Y - mountain.StartPoint.Y) * tempy + (mountain.StartPoint.X - mountain.EndPoint.X) * tempx)
-                        //                                        / Math.Pow(mountain.Length, 2));
-                        //}
                     }
                 }
-                // 如果山是水平方向的
-                //if (mountain.IsHorizontal)
-                //{
-                //    if (PlayerLabel.Right > mountain.StartPoint.X && PlayerLabel.Left < mountain.EndPoint.X)
-                //    {
-                //        if (SpeedOfY > 0)
-                //        {
-                //            int temp = random.Next(4);
-                //            if ((PlayerLabel.Bottom - mountain.StartPoint.Y) * (PlayerLabel.Bottom - mountain.EndPoint.Y - SpeedOfY) <= 0 && temp != 0)
-                //            {
-                //                SpeedOfY = -SpeedOfY;
-                //            }
-                //        }
-                //        else
-                //        {
-                //            int temp = random.Next(4);
-                //            if ((PlayerLabel.Top - mountain.StartPoint.Y) * (PlayerLabel.Top - mountain.EndPoint.Y - SpeedOfY) <= 0 && temp != 0)
-                //            {
-                //                SpeedOfY = -SpeedOfY;
-                //            }
-                //        }
-                //    }
-                //}
-                // 如果山是竖直方向的
-                //else if (mountain.IsVertical)
-                //{
-                //    if (PlayerLabel.Bottom > mountain.StartPoint.Y && PlayerLabel.Top < mountain.EndPoint.Y)
-                //    {
-                //        if (SpeedOfX > 0)
-                //        {
-                //            int temp = random.Next(4);
-                //            if ((PlayerLabel.Right - mountain.StartPoint.X) * (PlayerLabel.Right - mountain.EndPoint.X - SpeedOfX) <= 0 && temp != 0)
-                //            {
-                //                SpeedOfX = -SpeedOfX;
-                //            }
-                //        }
-                //        else
-                //        {
-                //            int temp = random.Next(4);
-                //            if ((PlayerLabel.Left - mountain.StartPoint.X) * (PlayerLabel.Left - mountain.EndPoint.X - SpeedOfX) <= 0 && temp != 0)
-                //            {
-                //                SpeedOfX = -SpeedOfX;
-                //            }
-                //        }
-                //    }
-                //}
-                // 如果山是斜向的并且玩家进入山的外接矩形中
-                //else if (mountain.Closure.IsCollapsed(this))
-                //{}
-                //return ((a.X - StartPoint.X) * (EndPoint.Y - StartPoint.Y) == (a.Y - StartPoint.Y) * (EndPoint.X - StartPoint.X));
             }
 
         }
 
         public void CollapsedRiver(River river)
         {
-            int Y = 1 / 2 * playerLabel.Width + playerLabel.Left;
-            int X = 1 / 2 * playerLabel.Height + playerLabel.Top;
-            int aa = river.EndPoint.X - river.StartPoint.X;
-            int bb = river.StartPoint.Y - river.EndPoint.Y;
-            int cc = river.StartPoint.X * (river.EndPoint.Y - river.StartPoint.Y) - river.StartPoint.Y * (river.EndPoint.X - river.StartPoint.X);
-            if (Math.Abs(aa * X + bb * Y + cc) / Math.Sqrt(aa ^ 2 + bb ^ 2) <= 100 &&
-                (X - river.StartPoint.Y) * (X - river.EndPoint.Y) <= 0 &&
-                (Y - river.StartPoint.X) * (Y - river.EndPoint.X) <= 0)
+            bool isCollapsed = river.IsCollapsed(this);
+            playerLabel.Text = $"{PlayerName} {combatForceLevel} {isCollapsed.ToString()}";
+
+            if (isCollapsed)
             {
-                playerLabel.Top += 200 / Convert.ToInt32(Math.Sqrt(aa ^ 2 + bb ^ 2) * (-bb));
-                playerLabel.Left += 200 / Convert.ToInt32(Math.Sqrt(aa ^ 2 + bb ^ 2) * aa);
+                playerLabel.Top +=  Convert.ToInt32(river.Length) * (river.EndPoint.Y - river.StartPoint.Y);
+                playerLabel.Left += Convert.ToInt32(river.Length) * (river.EndPoint.X - river.StartPoint.X);
             }
         }
 

@@ -45,7 +45,7 @@ namespace WindowsFormsApp1
             // vertical: form height = max object height - 48
             textBox1.Text = 3.ToString();
             MountainNumber.Text = 1.ToString();
-            RiverNumber.Text = 20.ToString();
+            RiverNumber.Text = 1.ToString();
             ClinicNumber.Text = 10.ToString();
             PitNumber.Text = 10.ToString();
             proprietorExists.Checked = true;
@@ -117,19 +117,6 @@ namespace WindowsFormsApp1
                 }
                 PlayerName.Close();
                 Array.Sort(players);
-                // Horizontal Order Sorting
-                //for (int i = 0; i < Player.PlayerNumber; i++)
-                //{
-                //    for (int j = 0; j < Player.PlayerNumber; j++)
-                //    {
-                //        if (players[i].PlayerLabel.Left > players[j].PlayerLabel.Left && players[i].HorizontalOrder < players[j].HorizontalOrder)
-                //        {
-                //            int temp = players[i].HorizontalOrder;
-                //            players[i].HorizontalOrder = players[j].HorizontalOrder;
-                //            players[j].HorizontalOrder = temp;
-                //        }
-                //    }
-                //}
             }// player number
             if (!int.TryParse(MountainNumber.Text, out Temp))
             {
@@ -326,18 +313,18 @@ namespace WindowsFormsApp1
             //}
             for (int i = 0; i < Player.PlayerNumber; ++i)
             {
-                for (int j = 0; j < mountains.Length; ++j)
-                {
-                    players[i].CollapsedMountain(mountains[j]);
-                    while (players[i].Polygon.IsCover(mountains[j].Polygon))
-                    {
-                        players[i].Move(BattleField);
-                    }
-                }
-                //for (int j = 0; j < rivers.Length; ++j)
+                //for (int j = 0; j < mountains.Length; ++j)
                 //{
-                //    players[i].CollapsedRiver(rivers[j]);
+                //    players[i].CollapsedMountain(mountains[j]);
+                //    while (players[i].Polygon.IsCover(mountains[j].Polygon))
+                //    {
+                //        players[i].Move(BattleField);
+                //    }
                 //}
+                for (int j = 0; j < rivers.Length; ++j)
+                {
+                    players[i].CollapsedRiver(rivers[j]);
+                }
                 //for (int j = 0; j < clinics.Length; ++j)
                 //{
                 //    players[i].CollapseClinic(clinics[j]);

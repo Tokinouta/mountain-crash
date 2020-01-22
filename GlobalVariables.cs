@@ -149,6 +149,17 @@ namespace WindowsFormsApp1
         public River(int startX, int startY, int endX, int endY) : base(startX, startY, endX, endY) { }
         // 河没有水平或垂直的，所以直接构造斜向
         public River(double switchL, GroupBox BattleField) : base(2, switchL, BattleField) { }
+
+        public bool IsCollapsed(Player player)
+        {
+            int aa = EndPoint.X - StartPoint.X;
+            int bb = StartPoint.Y - EndPoint.Y;
+            int cc = StartPoint.X * (EndPoint.Y - StartPoint.Y) - StartPoint.Y * (EndPoint.X - StartPoint.X);
+            bool isCollapsed = Math.Abs(aa * player.CenterTop + bb * player.CenterLeft + cc) / Math.Sqrt(Math.Pow(aa, 2) + Math.Pow(bb, 2)) <= 100 &&
+                (player.CenterTop - StartPoint.Y) * (player.CenterTop - EndPoint.Y) <= 0 &&
+                (player.CenterLeft - StartPoint.X) * (player.CenterLeft - EndPoint.X) <= 0;
+            return isCollapsed;
+        }
     }
 
     public class RectangleBarrier
