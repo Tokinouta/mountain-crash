@@ -55,8 +55,6 @@ namespace WindowsFormsApp1
             ozoneExists.Checked = true;
             combatForceOptions.SelectedIndex = 2;
 
-
-
             if (combatForceOptions.SelectedIndex < 0)
             {
                 MessageBox.Show("Please choose combat force options", "Warning: No choice of combat options");
