@@ -106,7 +106,7 @@ namespace WindowsFormsApp1
             speedOfY = random.Next(-10, 10);
             horizontalOrder = creatingOrder;
             this.creatingOrder = creatingOrder;
-            hitPoint = 510;
+            hitPoint = 10;
             isAlive = true;
             switch (combatForceOption)
             {
@@ -242,8 +242,8 @@ namespace WindowsFormsApp1
                             player.HitPoint -= Convert.ToInt32(Math.Abs(CombatForceLevel - player.CombatForceLevel) / 2.5);
                             break;
                         case 2:
-                            player.HitPoint -= Convert.ToInt32(CombatForceLevel / 8);
-                            HitPoint -= Convert.ToInt32(player.CombatForceLevel / 8);
+                            player.HitPoint -= Convert.ToInt32(CombatForceLevel);
+                            HitPoint -= Convert.ToInt32(player.CombatForceLevel);
                             break;
                         case 3:
                             player.HitPoint -= Convert.ToInt32(Math.Abs(CombatForceLevel - player.CombatForceLevel) / 2.5);
@@ -311,17 +311,20 @@ namespace WindowsFormsApp1
             }
             else if (HitPoint <= 255 && HitPoint > 0)
             {
-                PlayerLabel.BackColor = Color.FromArgb(510 - HitPoint, 255, 0);
+                PlayerLabel.BackColor = Color.FromArgb(255, HitPoint, 0);
             }
             else
             {
                 BattleField.Controls.Remove(PlayerLabel);
                 IsAlive = false;
-                PlayerRemainedNumber -= 1;
+                if (playerRemainedNumber != 0)
+                {
+                    PlayerRemainedNumber--;
+                }
             }
         }
 
-        public void UpdateSpeed()
+    public void UpdateSpeed()
         {
             Random random = new Random(Guid.NewGuid().GetHashCode());
             speedOfX = random.Next(-10, 10);
@@ -330,7 +333,7 @@ namespace WindowsFormsApp1
 
         public void UpdateLabel()
         {
-            playerLabel.Text = $"{playerName} {combatForceLevel.ToString()}";
+            playerLabel.Text = $"{playerName} {combatForceLevel.ToString()} {hitPoint.ToString()}";
         }
 
         public void UpdateBattleForceLevel(ComboBox combatForceOptions, Player[] players)
@@ -382,7 +385,7 @@ namespace WindowsFormsApp1
         {
             Random random = new Random(Guid.NewGuid().GetHashCode());
             bool isCollapsed = polygon.IsCover(mountain.Polygon);
-            playerLabel.Text = $"{PlayerName} {combatForceLevel} {isCollapsed.ToString()}";
+            //playerLabel.Text = $"{PlayerName} {combatForceLevel} {isCollapsed.ToString()}";
             if (isCollapsed)
             {
                 //MessageBox.Show("collapsed");
@@ -419,12 +422,12 @@ namespace WindowsFormsApp1
         public void CollapsedRiver(River river)
         {
             bool isCollapsed = river.IsCollapsed(this);
-            playerLabel.Text = $"{PlayerName} {combatForceLevel} {isCollapsed.ToString()}";
+            //playerLabel.Text = $"{PlayerName} {combatForceLevel} {isCollapsed.ToString()}";
 
             if (isCollapsed)
             {
-                playerLabel.Top +=  Convert.ToInt32(river.Length) * (river.EndPoint.Y - river.StartPoint.Y);
-                playerLabel.Left += Convert.ToInt32(river.Length) * (river.EndPoint.X - river.StartPoint.X);
+                playerLabel.Top +=  (river.EndPoint.Y - river.StartPoint.Y) * Math.Sign(speedOfY);
+                playerLabel.Left += (river.EndPoint.X - river.StartPoint.X) * Math.Sign(speedOfX);
             }
         }
 
@@ -920,7 +923,7 @@ namespace WindowsFormsApp1
             PlayerLabel.Text = $"{PlayerName} {CombatForceLevel.ToString()}";
         }
 
-        public new void SpeedChange()
+        public void SpeedChange()
         {
             Random random = new Random(Guid.NewGuid().GetHashCode());
             SpeedOfX = 2 * random.Next(-10, 10);

@@ -13,7 +13,7 @@ namespace WindowsFormsApp1
 {
     public partial class Form1 : Form
     {
-        Player[] players = null;
+        List<Player> players = null;
         Mountain[] mountains = null;
         River[] rivers = null;
         Clinic[] clinics = null;
@@ -44,8 +44,8 @@ namespace WindowsFormsApp1
             // horisontal: form width = max object width - 18
             // vertical: form height = max object height - 48
             textBox1.Text = 3.ToString();
-            MountainNumber.Text = 1.ToString();
-            RiverNumber.Text = 1.ToString();
+            MountainNumber.Text = 10.ToString();
+            RiverNumber.Text = 10.ToString();
             ClinicNumber.Text = 10.ToString();
             PitNumber.Text = 10.ToString();
             proprietorExists.Checked = true;
@@ -54,7 +54,13 @@ namespace WindowsFormsApp1
             hatExists.Checked = true;
             ozoneExists.Checked = true;
             combatForceOptions.SelectedIndex = 2;
+            killOptions.SelectedIndex = 2;
 
+            if (killOptions.SelectedIndex < 0)
+            {
+                MessageBox.Show("Please choose kill options", "Warning: No choice of kill options");
+                return;
+            }
             if (combatForceOptions.SelectedIndex < 0)
             {
                 MessageBox.Show("Please choose combat force options", "Warning: No choice of combat options");
@@ -82,41 +88,53 @@ namespace WindowsFormsApp1
                 Player.PlayerNumber = Temp;
                 Player.PlayerRemainedNumber = Temp;
 
-                if (proprietorExists.Checked)
-                {
-                    proprieter = new Proprieter(BattleField);
-                }
-                if (eggExists.Checked)
-                {
-                    egg = new Egg(BattleField);
-                }
-                if (elfExists.Checked)
-                {
-                    elf = new Elf(BattleField);
-                }
-                if (hatExists.Checked)
-                {
-                    hat = new Hat(combatForceOptions.SelectedIndex, BattleField);
-                }
-                if (ozoneExists.Checked)
-                {
-                    ozone = new Ozone(combatForceOptions.SelectedIndex, BattleField);
-                }
-
-                players = new Player[Temp];
+                //players = new Player[Temp];
+                players = new List<Player>();
                 Player.CombatForceLevelCache = new double[Temp / 4];
                 StreamReader PlayerName = new StreamReader(@"./PlayerName.txt");
                 for (int i = 0; i < Temp; i++)
                 {
-                    players[i] = new Player(i, combatForceOptions.SelectedIndex, BattleField)
+                    var p = new Player(i, combatForceOptions.SelectedIndex, BattleField)
                     {
-                        PlayerName = PlayerName.ReadLine()                 
+                        PlayerName = PlayerName.ReadLine()
                     };
-                    players[i].PlayerLabel.Text = $"{players[i].PlayerName} {players[i].CombatForceLevel.ToString()}";
-                    players[i].LocationChanged += new LocationChangedEventHandler(Moved);
+                    p.PlayerLabel.Text = $"{p.PlayerName} {p.CombatForceLevel.ToString()}";
+                    p.LocationChanged += new LocationChangedEventHandler(Moved);
+                    players.Add(p);
                 }
                 PlayerName.Close();
-                Array.Sort(players);
+                players.Sort();
+
+                if (proprietorExists.Checked)
+                {
+                    proprieter = new Proprieter(BattleField);
+                    proprieter.LocationChanged += new LocationChangedEventHandler(Moved);
+                    players.Add(proprieter);
+                }
+                if (eggExists.Checked)
+                {
+                    egg = new Egg(BattleField);
+                    egg.LocationChanged += new LocationChangedEventHandler(Moved);
+                    players.Add(egg);
+                }
+                if (elfExists.Checked)
+                {
+                    elf = new Elf(BattleField);
+                    elf.LocationChanged += new LocationChangedEventHandler(Moved);
+                    players.Add(elf);
+                }
+                if (hatExists.Checked)
+                {
+                    hat = new Hat(combatForceOptions.SelectedIndex, BattleField);
+                    hat.LocationChanged += new LocationChangedEventHandler(Moved);
+                    players.Add(hat);
+                }
+                if (ozoneExists.Checked)
+                {
+                    ozone = new Ozone(combatForceOptions.SelectedIndex, BattleField);
+                    ozone.LocationChanged += new LocationChangedEventHandler(Moved);
+                    players.Add(ozone);
+                }
             }// player number
             if (!int.TryParse(MountainNumber.Text, out Temp))
             {
@@ -180,7 +198,8 @@ namespace WindowsFormsApp1
             }// Pit  
 
             isGenerated = true;
-            playerRemained.Text = Player.PlayerRemainedNumber.ToString();
+            //playerRemained.Text = Player.PlayerRemainedNumber.ToString();
+            playerRemained.Text = players.Count.ToString();
             generation.Enabled = false;
             start.Enabled = true;
             clear.Enabled = true;
@@ -296,45 +315,89 @@ namespace WindowsFormsApp1
 
         private void timer1_Tick_1(object sender, EventArgs e)
         {
-            for (int i = 0; i < Player.PlayerNumber; ++i)
-            {
-                players[i].Move(BattleField);
-                //players[i].UpdateSpeed();
-                players[i].UpdateLabel();
-            }
-            Array.Sort(players);
+            //for (int i = 0; i < Player.PlayerNumber; ++i)
+            //{
+            //    players[i].Move(BattleField);
+            //    //players[i].UpdateSpeed();
+            //    players[i].UpdateLabel();
+            //}
+
             //for (int i = 0; i < Player.PlayerNumber; ++i)
             //{
             //    for (int j = i + 1; j < Player.PlayerNumber; ++j)
             //    {
             //        players[i].Battle(players[j], killOptions);
             //    }
+            //if (proprieter != null)
+            //{
+            //    players[i].Battle(proprieter, killOptions);
+            //}
+            //if (egg != null)
+            //{
+            //    players[i].Battle(egg, killOptions);
+            //}
+            //if (elf != null)
+            //{
+            //    players[i].Battle(elf, killOptions);
+            //}
+            //if (hat != null)
+            //{
+            //    players[i].Battle(hat, killOptions);
+            //}
+            //if (ozone != null)
+            //{
+            //    players[i].Battle(proprieter, killOptions);
+            //}
+
             //    players[i].UpdateColor(BattleField);
             //}
-            for (int i = 0; i < Player.PlayerNumber; ++i)
+
+            foreach (var player in players)
             {
-                //for (int j = 0; j < mountains.Length; ++j)
-                //{
-                //    players[i].CollapsedMountain(mountains[j]);
-                //    while (players[i].Polygon.IsCover(mountains[j].Polygon))
-                //    {
-                //        players[i].Move(BattleField);
-                //    }
-                //}
-                for (int j = 0; j < rivers.Length; ++j)
+                player.Move(BattleField);
+                //players[i].UpdateSpeed();
+                player.UpdateLabel();
+            }
+
+            players.Sort();
+
+            foreach (var player1 in players)
+            {
+                foreach (var player2 in players)
                 {
-                    players[i].CollapsedRiver(rivers[j]);
+                    if (player1 != player2)
+                    {
+                        player1.Battle(player2, killOptions);
+                        player1.Settle(player2, TimeInSecond);
+                    }
                 }
-                //for (int j = 0; j < clinics.Length; ++j)
-                //{
-                //    players[i].CollapseClinic(clinics[j]);
-                //}
-                //for (int j = 0; j < pits.Length; ++j)
-                //{
-                //    players[i].CollapsedPit(pits[j], pits);
-                //}
+                player1.UpdateColor(BattleField);
+                foreach (var mountain in mountains)
+                {
+                    player1.CollapsedMountain(mountain);
+                    while (player1.Polygon.IsCover(mountain.Polygon))
+                    {
+                        player1.Move(BattleField);
+                    }
+                }
+                foreach (var river in rivers)
+                {
+                    player1.CollapsedRiver(river);
+                }
+                foreach (var clinic in clinics)
+                {
+                    player1.CollapseClinic(clinic);
+                }
+                foreach (var pit in pits)
+                {
+                    player1.CollapsedPit(pit, pits);
+                }
             }
             playerRemained.Text = Player.PlayerRemainedNumber.ToString();
+            if (Player.PlayerRemainedNumber <= 1)
+            {
+                // end game
+            }
         }
 
         private void BattleField_Paint(object sender, PaintEventArgs e)
