@@ -44,8 +44,8 @@ namespace WindowsFormsApp1
             // horisontal: form width = max object width - 18
             // vertical: form height = max object height - 48
             textBox1.Text = 3.ToString();
-            MountainNumber.Text = 10.ToString();
-            RiverNumber.Text = 10.ToString();
+            MountainNumber.Text = 1.ToString();
+            RiverNumber.Text = 1.ToString();
             ClinicNumber.Text = 10.ToString();
             PitNumber.Text = 10.ToString();
             proprietorExists.Checked = true;
@@ -315,63 +315,24 @@ namespace WindowsFormsApp1
 
         private void timer1_Tick_1(object sender, EventArgs e)
         {
-            //for (int i = 0; i < Player.PlayerNumber; ++i)
-            //{
-            //    players[i].Move(BattleField);
-            //    //players[i].UpdateSpeed();
-            //    players[i].UpdateLabel();
-            //}
-
-            //for (int i = 0; i < Player.PlayerNumber; ++i)
-            //{
-            //    for (int j = i + 1; j < Player.PlayerNumber; ++j)
-            //    {
-            //        players[i].Battle(players[j], killOptions);
-            //    }
-            //if (proprieter != null)
-            //{
-            //    players[i].Battle(proprieter, killOptions);
-            //}
-            //if (egg != null)
-            //{
-            //    players[i].Battle(egg, killOptions);
-            //}
-            //if (elf != null)
-            //{
-            //    players[i].Battle(elf, killOptions);
-            //}
-            //if (hat != null)
-            //{
-            //    players[i].Battle(hat, killOptions);
-            //}
-            //if (ozone != null)
-            //{
-            //    players[i].Battle(proprieter, killOptions);
-            //}
-
-            //    players[i].UpdateColor(BattleField);
-            //}
-
             foreach (var player in players)
             {
+                if (!player.IsAlive)
+                {
+                    continue;
+                }
                 player.Move(BattleField);
                 //players[i].UpdateSpeed();
                 player.UpdateLabel();
             }
 
-            players.Sort();
-
             foreach (var player1 in players)
             {
-                foreach (var player2 in players)
+                if (!player1.IsAlive)
                 {
-                    if (player1 != player2)
-                    {
-                        player1.Battle(player2, killOptions);
-                        player1.Settle(player2, TimeInSecond);
-                    }
+                    player1.UpdateColor(BattleField);
+                    continue;
                 }
-                player1.UpdateColor(BattleField);
                 foreach (var mountain in mountains)
                 {
                     player1.CollapsedMountain(mountain);
@@ -392,11 +353,23 @@ namespace WindowsFormsApp1
                 {
                     player1.CollapsedPit(pit, pits);
                 }
+
+                foreach (var player2 in players)
+                {
+                    if (player1 != player2 && player2.IsAlive && player1.IsAlive)
+                    {
+                        player1.Battle(player2, killOptions);
+                        player1.Settle(player2, TimeInSecond);
+                    }
+                    player1.UpdateColor(BattleField);
+                }
             }
             playerRemained.Text = Player.PlayerRemainedNumber.ToString();
             if (Player.PlayerRemainedNumber <= 1)
             {
-                // end game
+                timerForBattle.Enabled = false;
+
+                return;
             }
         }
 

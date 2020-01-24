@@ -106,7 +106,7 @@ namespace WindowsFormsApp1
             speedOfY = random.Next(-10, 10);
             horizontalOrder = creatingOrder;
             this.creatingOrder = creatingOrder;
-            hitPoint = 10;
+            hitPoint = 510;
             isAlive = true;
             switch (combatForceOption)
             {
@@ -280,6 +280,11 @@ namespace WindowsFormsApp1
             }
         }
 
+        public bool IsPlayer()
+        {
+            return !GetType().IsSubclassOf(typeof(Player));
+        }
+
         //'结算幸存时间、殉职排名、殉职人数、交战得分、被殉职
         public void Settle(Player player, int survivalTime)
         {
@@ -291,6 +296,10 @@ namespace WindowsFormsApp1
                 player.AttackScore += Convert.ToInt32(300 * Math.Sqrt(1 / 300 * survivalTime));
                 KilledBy = player.PlayerName;
                 IsAlive = false;
+                if (playerRemainedNumber != 0 && IsPlayer())
+                {
+                    PlayerRemainedNumber--;
+                }
             }
             else if (player.HitPoint <= 0 && player.IsAlive)
             {
@@ -300,6 +309,10 @@ namespace WindowsFormsApp1
                 attackScore += Convert.ToInt32(300 * Math.Sqrt(1 / 300 * survivalTime));
                 player.KilledBy = PlayerName;
                 player.IsAlive = false;
+                if (playerRemainedNumber != 0 && player.IsPlayer())
+                {
+                    PlayerRemainedNumber--;
+                }
             }
         }
 
@@ -316,20 +329,16 @@ namespace WindowsFormsApp1
             else
             {
                 BattleField.Controls.Remove(PlayerLabel);
-                IsAlive = false;
-                if (playerRemainedNumber != 0)
-                {
-                    PlayerRemainedNumber--;
-                }
+                //polygon = null;
             }
         }
 
-    public void UpdateSpeed()
-        {
-            Random random = new Random(Guid.NewGuid().GetHashCode());
-            speedOfX = random.Next(-10, 10);
-            speedOfY = random.Next(-10, 10);
-        }
+        public void UpdateSpeed()
+            {
+                Random random = new Random(Guid.NewGuid().GetHashCode());
+                speedOfX = random.Next(-10, 10);
+                speedOfY = random.Next(-10, 10);
+            }
 
         public void UpdateLabel()
         {
@@ -388,7 +397,6 @@ namespace WindowsFormsApp1
             //playerLabel.Text = $"{PlayerName} {combatForceLevel} {isCollapsed.ToString()}";
             if (isCollapsed)
             {
-                //MessageBox.Show("collapsed");
                 int temp = random.Next(2, 4);
                 if (temp != 0)
                 {
@@ -428,6 +436,11 @@ namespace WindowsFormsApp1
             {
                 playerLabel.Top +=  (river.EndPoint.Y - river.StartPoint.Y) * Math.Sign(speedOfY);
                 playerLabel.Left += (river.EndPoint.X - river.StartPoint.X) * Math.Sign(speedOfX);
+                // 引起位置变化的地方都要触发LocationChanged事件
+                LocationChangedEventArgs e = new LocationChangedEventArgs(
+                    (river.EndPoint.X - river.StartPoint.X) * Math.Sign(speedOfX),
+                    (river.EndPoint.Y - river.StartPoint.Y) * Math.Sign(speedOfY));
+                LocationChanged(this, e);
             }
         }
 
@@ -453,6 +466,9 @@ namespace WindowsFormsApp1
             if (pit.IsCollapsed(this))
             {
                 Random random = new Random(Guid.NewGuid().GetHashCode());
+                double x = playerLabel.Left;
+                double y = playerLabel.Top;
+
                 int temp;
                 do
                 {
@@ -462,7 +478,11 @@ namespace WindowsFormsApp1
                 playerLabel.Left = pits[temp].Left + 1 / 2 * pits[temp].Width - 1 / 2 * playerLabel.Width + temp1 * speedOfY;
                 playerLabel.Top = pits[temp].Top + 1 / 2 * pits[temp].Height - 1 / 2 * playerLabel.Height + temp1 * speedOfX;
                 bonus--; // 掉坑减分
-
+                
+                // 引起位置变化的地方都要触发LocationChanged事件
+                LocationChangedEventArgs e =
+                    new LocationChangedEventArgs(playerLabel.Left - x, playerLabel.Top - y);
+                LocationChanged(this, e);
             }
         }
         #endregion
@@ -549,6 +569,10 @@ namespace WindowsFormsApp1
                 KillNumber++;
                 player.KilledBy = PlayerName;
                 player.IsAlive = false;
+                if (PlayerRemainedNumber != 0 && player.IsPlayer())
+                {
+                    PlayerRemainedNumber--;
+                }
             }
             else if (HitPoint <= 0 && IsAlive)
             {
@@ -627,6 +651,10 @@ namespace WindowsFormsApp1
                 KillNumber++;
                 player.KilledBy = PlayerName;
                 player.IsAlive = false;
+                if (PlayerRemainedNumber != 0 && player.IsPlayer())
+                {
+                    PlayerRemainedNumber--;
+                }
             }
             else if (HitPoint <= 0 && IsAlive)
             {
@@ -694,6 +722,10 @@ namespace WindowsFormsApp1
                 KillNumber++;
                 player.KilledBy = PlayerName;
                 player.IsAlive = false;
+                if (PlayerRemainedNumber != 0 && player.IsPlayer())
+                {
+                    PlayerRemainedNumber--;
+                }
             }
             else if (HitPoint <= 0 && IsAlive)
             {
@@ -881,6 +913,10 @@ namespace WindowsFormsApp1
                     player.SurvivalRank = PlayerRemainedNumber;
                     player.KilledBy = PlayerName;
                     player.IsAlive = false;
+                    if (PlayerRemainedNumber != 0 && player.IsPlayer())
+                    {
+                        PlayerRemainedNumber--;
+                    }
                 }
                 isStatemate[order] = true;
             }
@@ -947,6 +983,10 @@ namespace WindowsFormsApp1
                 KillNumber++;
                 player.KilledBy = PlayerName;
                 player.IsAlive = false;
+                if (PlayerRemainedNumber != 0 && player.IsPlayer())
+                {
+                    PlayerRemainedNumber--;
+                }
             }
             else if (HitPoint <= 0 && IsAlive)
             {

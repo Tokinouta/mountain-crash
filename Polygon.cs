@@ -111,6 +111,11 @@ namespace WindowsFormsApp1
 
         public bool IsCover(Polygon b)
         {
+            if (this == null || b == null)
+            {
+                return false;
+            }
+
             for (int i = 0; i < n; i++)
             {
                 // Get the direction vector
