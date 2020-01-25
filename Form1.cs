@@ -235,7 +235,7 @@ namespace WindowsFormsApp1
             }
             if (elf != null)
             {
-                elf.TimerOfRecharge.Enabled = true;
+                elf.TimerOfProtection.Enabled = true;
             }
 
             isStarted = true;
@@ -271,7 +271,7 @@ namespace WindowsFormsApp1
             }
             if (elf != null)
             {
-                elf.TimerOfRecharge.Enabled = false;
+                elf.TimerOfProtection.Enabled = false;
             }
         }
 
@@ -289,7 +289,7 @@ namespace WindowsFormsApp1
                 }
                 if (elf != null)
                 {
-                    elf.TimerOfRecharge.Enabled = false;
+                    elf.TimerOfProtection.Enabled = false;
                 }
                 pause.Text = "Continue";
                 isStarted = false;
@@ -304,10 +304,10 @@ namespace WindowsFormsApp1
                 {
                     hat.TimerCountDown.Enabled = true;
                 }
-                if (elf != null)
-                {
-                    elf.TimerOfRecharge.Enabled = true;
-                }
+                //if (elf != null)
+                //{
+                //    elf.TimerOfRecharge.Enabled = true;
+                //}
                 pause.Text = "Pause";
                 isStarted = true;
             }
@@ -325,6 +325,7 @@ namespace WindowsFormsApp1
                 //players[i].UpdateSpeed();
                 player.UpdateLabel();
             }
+
 
             foreach (var player1 in players)
             {
@@ -354,6 +355,19 @@ namespace WindowsFormsApp1
                     player1.CollapsedPit(pit, pits);
                 }
 
+                if (proprieter != null && proprieter.IsAlive)
+                {
+                    proprieter.FingerGame(players);
+                    foreach (var player2 in players)
+                    {
+                        if (proprieter != player2 && player2.IsAlive && player2.Polygon.IsCover(proprieter.Polygon))
+                        {
+                            proprieter.Settle(player2, TimeInSecond);
+                            player2.UpdateColor(BattleField);
+                        }
+                    }
+                }
+
                 foreach (var player2 in players)
                 {
                     if (player1 != player2 && player2.IsAlive && player1.IsAlive)
@@ -363,14 +377,27 @@ namespace WindowsFormsApp1
                     }
                     player1.UpdateColor(BattleField);
                 }
-            }
-            playerRemained.Text = Player.PlayerRemainedNumber.ToString();
-            if (Player.PlayerRemainedNumber <= 1)
-            {
-                timerForBattle.Enabled = false;
 
-                return;
+                foreach (var player2 in players)
+                {
+                    if (egg != null && player1 == egg && player2 != egg && player2.IsAlive && !egg.IsInEarth)
+                    {
+                        egg.GetIntoEarth(player2);
+                        player1.Settle(player2, TimeInSecond);
+                    }
+                    player1.UpdateColor(BattleField);
+                }
+
             }
+
+
+            playerRemained.Text = Player.PlayerRemainedNumber.ToString();
+            //if (Player.PlayerRemainedNumber <= 1)
+            //{
+            //    timerForBattle.Enabled = false;
+
+            //    return;
+            //}
         }
 
         private void BattleField_Paint(object sender, PaintEventArgs e)

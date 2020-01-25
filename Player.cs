@@ -277,6 +277,14 @@ namespace WindowsFormsApp1
                             break;
                     }
                 }
+                if (HitPoint <= 0 && IsAlive)
+                {
+                    KilledBy = player.PlayerName;
+                }
+                else if (player.HitPoint <= 0 && player.IsAlive)
+                {
+                    player.KilledBy = PlayerName;
+                }
             }
         }
 
@@ -502,7 +510,7 @@ namespace WindowsFormsApp1
         int countDown;
         // 殉职草帽大叔的玩家
         Player playerKilledHat;
-        Timer timerCountDown;
+        System.Windows.Forms.Timer timerCountDown;
 
         public Hat(GroupBox BattleField) : base(BattleField)
         {
@@ -531,7 +539,7 @@ namespace WindowsFormsApp1
             PlayerName = "草帽大叔";
             PlayerLabel.Text = $"{PlayerName} {CombatForceLevel.ToString()}";
             PlayerLabel.BackColor = Color.Green;
-            timerCountDown = new Timer
+            timerCountDown = new System.Windows.Forms.Timer
             {
                 Interval = 1000,
                 Enabled = false
@@ -558,7 +566,7 @@ namespace WindowsFormsApp1
 
         public int CountDown { get => countDown; set => countDown = value; }
         public Player PlayerKilledHat { get => playerKilledHat; set => playerKilledHat = value; }
-        public Timer TimerCountDown { get => timerCountDown; set => timerCountDown = value; }
+        public System.Windows.Forms.Timer TimerCountDown { get => timerCountDown; set => timerCountDown = value; }
 
         public new void Settle(Player player, int survivalTime)
         {
@@ -594,7 +602,6 @@ namespace WindowsFormsApp1
         int periodOfRecharge;
         // 精灵保护的玩家
         Player playerProtectedByElf;
-        Timer timerOfRecharge;
 
         public Elf(GroupBox BattleField) : base(BattleField)
         {
@@ -604,12 +611,23 @@ namespace WindowsFormsApp1
             PlayerName = "精灵";
             PlayerLabel.Text = $"{PlayerName} {CombatForceLevel.ToString()}";
             PlayerLabel.BackColor = Color.Green;
-            timerOfRecharge = new Timer
+            TimerOfProtection = new System.Windows.Forms.Timer
             {
                 Interval = 1000,
                 Enabled = false
             };
-            timerOfRecharge.Tick += new EventHandler(TimerOfRecharge_Tick);
+            TimerOfProtection.Tick += new EventHandler(TimerOfRecharge_Tick);
+            TimerOfRecharge = new Timer
+            {
+                Interval = 60000,
+                Enabled = false
+            };
+            TimerOfRecharge.Tick += Recharge;
+        }
+
+        private void Recharge(object sender, EventArgs e)
+        {
+            HitPoint = 510;
         }
 
         private void TimerOfRecharge_Tick(object sender, EventArgs e)
@@ -618,7 +636,7 @@ namespace WindowsFormsApp1
             if (periodOfRecharge == 0)
             {
                 Random random = new Random(Guid.NewGuid().GetHashCode());
-                timerOfRecharge.Enabled = false;
+                TimerOfProtection.Enabled = false;
                 periodOfRecharge = 60;
                 PlayerLabel.Visible = true;
                 PlayerLabel.Left = 0;
@@ -640,7 +658,8 @@ namespace WindowsFormsApp1
 
         public int PeriodOfRecharge { get => periodOfRecharge; set => periodOfRecharge = value; }
         public Player PlayerProtectedByElf { get => playerProtectedByElf; set => playerProtectedByElf = value; }
-        public Timer TimerOfRecharge { get => timerOfRecharge; set => timerOfRecharge = value; }
+        public Timer TimerOfProtection { get; set; }
+        public Timer TimerOfRecharge { get; set; }
 
         public new void Settle(Player player, int survivalTime)
         {
@@ -664,21 +683,10 @@ namespace WindowsFormsApp1
                 IsAlive = false;
                 player.HitPoint = 510;
                 playerProtectedByElf = player;
-                timerOfRecharge.Enabled = true;
+                TimerOfProtection.Enabled = true;
+                TimerOfRecharge.Enabled = false;
             }
         }
-
-        public void Recharge()
-        {
-            var t = Task.Run(async delegate
-            {
-                await Task.Delay(2000);
-                return 42;
-            });
-            t.Wait();
-        }
-
-
     }
 
     public class Egg : Player
@@ -693,24 +701,64 @@ namespace WindowsFormsApp1
             CombatForceLevel = 2;
             PlayerName = "弱蛋";
             PlayerLabel.Text = $"{PlayerName} {CombatForceLevel.ToString()}";
+            GettingIntoEarth = new System.Windows.Forms.Timer
+            {
+                Interval = 2000,
+                Enabled = false
+            };
+            GettingIntoEarth.Tick += Timer_Tick;
+            IsInEarth = false;
         }
 
         public int TimeGettingIntoEarth { get => timeGettingIntoEarth; set => timeGettingIntoEarth = value; }
+        public Timer GettingIntoEarth { get; set; }
+        public bool IsInEarth { get; set; }
+
+        private delegate void GetIntoEarthCallback();
 
         public void GetIntoEarth(Player player)
         {
             if (Polygon.IsCover(player.Polygon))
             {
-                PlayerLabel.Enabled = false;
-                var t = Task.Run(async delegate
-                {
-                    await Task.Delay(2000);
-                    return 42;
-                });
-                t.Wait();
-                HitPoint -= Convert.ToInt32(player.CombatForceLevel / 2);
-                PlayerLabel.Enabled = true;
+                PlayerLabel.Visible = false;
+                IsAlive = false;
+                IsInEarth = true;
+                GettingIntoEarth.Enabled = true;
+                //PlayerLabel.Visible = false;
+                //Thread thread = new Thread(returnCB);
+                //thread.IsBackground = true;
+                //thread.Start();
+                //var t = Task.Run(delegate
+                //{
+                //    Task.Delay(2000);     
+                //    HitPoint -= Convert.ToInt32(player.CombatForceLevel / 2);
+                //});
+                //PlayerLabel.Visible = true;
             }
+        }
+
+
+        //private void Delay(int milliSecond)
+        //{
+        //    System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer
+        //    {
+        //        Interval = 2000
+        //    };
+        //    timer.Tick += Timer_Tick;
+            //int start = Environment.TickCount;
+            //while (Math.Abs(Environment.TickCount - start) < milliSecond)
+            //{
+            //    Application.DoEvents();
+            //}
+            //Thread.Sleep(milliSecond);
+        //}
+
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            PlayerLabel.Visible = true;
+            IsAlive = true;
+            IsInEarth = false;
+            GettingIntoEarth.Enabled = false;
         }
 
         public new void Settle(Player player, int survivalTime)
@@ -814,14 +862,14 @@ namespace WindowsFormsApp1
         public int[] FingerGuessWin { get => fingerGuessWin; set => fingerGuessWin = value; }
         public bool[] IsStatemate { get => isStatemate; set => isStatemate = value; }
 
-        public void FingerGame(Player[] players)
+        public void FingerGame(List<Player> players)
         {
             Random random = new Random(Guid.NewGuid().GetHashCode());
 
             fistProprieter = random.Next(3);
             PlayerLabel.Text = $"{PlayerName} {CombatForceLevel} " +
                 $"{(fistProprieter == 0 ? "剪刀" : fistProprieter == 1 ? "石头" : "布")}";
-            for (int i = 0; i < players.Length;++i)
+            for (int i = 0; i < PlayerNumber;++i)
             {
                 int order = players[i].CreatingOrder;
 
