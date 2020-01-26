@@ -86,7 +86,7 @@ namespace WindowsFormsApp1
             bonus = 0;
             playerLabel = new Label
             {
-                Height = 10,
+                Height = 15,
                 Width = 100,
                 Top = random.Next(BattleField.Height - 10),
                 Left = random.Next(BattleField.Width - 100),
@@ -157,7 +157,7 @@ namespace WindowsFormsApp1
             bonus = 0;
             playerLabel = new Label
             {
-                Height = 10,
+                Height = 15,
                 Width = 100,
                 Top = random.Next(BattleField.Height - 10),
                 Left = random.Next(BattleField.Width - 100),
@@ -208,6 +208,9 @@ namespace WindowsFormsApp1
         public Polygon Polygon { get => polygon; set => polygon = value; }
         public int CenterLeft { get => playerLabel.Left + playerLabel.Width / 2; }
         public int CenterTop { get => playerLabel.Top + playerLabel.Height / 2; }
+        public bool IsPlayer { get => !GetType().IsSubclassOf(typeof(Player)); }
+
+
         #endregion
 
         public void Move(GroupBox BattleField)
@@ -215,11 +218,28 @@ namespace WindowsFormsApp1
             double x = playerLabel.Left;
             double y = playerLabel.Top;
             playerLabel.Top += Convert.ToInt32(SpeedOfY);
-            playerLabel.Top = playerLabel.Top < 0 ? BattleField.Height - playerLabel.Height :
-                (playerLabel.Top > BattleField.Height - playerLabel.Height ? 0 : playerLabel.Top);
             playerLabel.Left += Convert.ToInt32(SpeedOfX);
-            playerLabel.Left = playerLabel.Left < 0 ? BattleField.Width - playerLabel.Width :
-                (playerLabel.Left > BattleField.Width - playerLabel.Width ? 0 : playerLabel.Left);
+            if (playerLabel.Top < 0)
+            {
+                speedOfY = -speedOfY;
+                playerLabel.Top = 1;
+            }
+            else if (playerLabel.Top > BattleField.Height - playerLabel.Height)
+            {
+                speedOfY = -speedOfY;
+                playerLabel.Top = BattleField.Height - playerLabel.Height - 1;
+            }
+
+            if (playerLabel.Left < 0)
+            {
+                speedOfX = -speedOfX;
+                playerLabel.Left = 1;
+            }
+            else if (playerLabel.Left > BattleField.Width - playerLabel.Width)
+            {
+                speedOfX = -speedOfX;
+                playerLabel.Left = BattleField.Width - playerLabel.Width - 1;
+            }
             LocationChangedEventArgs e = 
                 new LocationChangedEventArgs(playerLabel.Left - x, playerLabel.Top - y);
             LocationChanged(this, e);
@@ -290,10 +310,6 @@ namespace WindowsFormsApp1
             }
         }
 
-        public bool IsPlayer()
-        {
-            return !GetType().IsSubclassOf(typeof(Player));
-        }
 
         //'结算幸存时间、殉职排名、殉职人数、交战得分、被殉职
         public void Settle(int survivalTime)
@@ -305,7 +321,7 @@ namespace WindowsFormsApp1
                 killedBy.KillNumber++;
                 killedBy.AttackScore += Convert.ToInt32(300 * Math.Sqrt(1 / 300 * survivalTime));
                 IsAlive = false;
-                if (playerRemainedNumber != 0 && IsPlayer())
+                if (playerRemainedNumber != 0 && IsPlayer)
                 {
                     PlayerRemainedNumber--;
                 }
@@ -383,6 +399,22 @@ namespace WindowsFormsApp1
                     }
                     break;
             }
+        }
+
+        public string ShowInfo()
+        {
+            string killedby;
+            if (IsPlayer)
+            {
+                killedby = killedBy == null ? "winner" : killedBy.PlayerName;
+            }
+            else
+            {
+                killedby = killedBy == null ? "none" : killedBy.PlayerName;
+            }
+            return $"{PlayerName,-10}\t{survivalRank.ToString(),3}\t{creatingOrder.ToString(),3}\t{score.ToString(),3}\t" +
+                   $"{survivalTime.ToString(),3}\t{timeScore.ToString(),3}\t{attackScore.ToString(),3}\t" +
+                   $"{killNumber.ToString(),3}\t{bonus.ToString(),3}\t{killedby}\n";
         }
 
         #region Interaction
@@ -488,7 +520,19 @@ namespace WindowsFormsApp1
         {
             if (player == null) throw new ArgumentNullException("other");
             // compare to BookNo
-            return this.PlayerLabel.Left.CompareTo(player.PlayerLabel.Left);
+            int result = survivalRank.CompareTo(player.survivalRank);
+            if (!IsPlayer)
+            {
+                return 1;
+            }
+            else if (!player.IsPlayer)
+            {
+                return -1;
+            }
+            else
+            {
+                return result;
+            }
         }
         #endregion
     }
@@ -591,7 +635,7 @@ namespace WindowsFormsApp1
                 Interval = 1000,
                 Enabled = false
             };
-            TimerOfProtection.Tick += new EventHandler(TimerOfRecharge_Tick);
+            TimerOfProtection.Tick += new EventHandler(Protection);
             TimerOfRecharge = new Timer
             {
                 Interval = 60000,
@@ -605,7 +649,7 @@ namespace WindowsFormsApp1
             HitPoint = 510;
         }
 
-        private void TimerOfRecharge_Tick(object sender, EventArgs e)
+        private void Protection(object sender, EventArgs e)
         {
             periodOfRecharge -= 1;
             if (periodOfRecharge == 0)
@@ -695,35 +739,8 @@ namespace WindowsFormsApp1
                 IsAlive = false;
                 IsInEarth = true;
                 GettingIntoEarth.Enabled = true;
-
-                //PlayerLabel.Visible = false;
-                //Thread thread = new Thread(returnCB);
-                //thread.IsBackground = true;
-                //thread.Start();
-                //var t = Task.Run(delegate
-                //{
-                //    Task.Delay(2000);     
-                //    
-                //});
-                //PlayerLabel.Visible = true;
             }
         }
-
-
-        //private void Delay(int milliSecond)
-        //{
-        //    System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer
-        //    {
-        //        Interval = 2000
-        //    };
-        //    timer.Tick += Timer_Tick;
-            //int start = Environment.TickCount;
-            //while (Math.Abs(Environment.TickCount - start) < milliSecond)
-            //{
-            //    Application.DoEvents();
-            //}
-            //Thread.Sleep(milliSecond);
-        //}
 
         private void Timer_Tick(object sender, EventArgs e)
         {
@@ -830,6 +847,10 @@ namespace WindowsFormsApp1
                 $"{(fistProprieter == 0 ? "剪刀" : fistProprieter == 1 ? "石头" : "布")}";
             for (int i = 0; i < PlayerNumber;++i)
             {
+                if (!players[i].IsAlive)
+                {
+                    continue;
+                }
                 int order = players[i].CreatingOrder;
 
                 int temp = random.Next(14);
@@ -872,7 +893,8 @@ namespace WindowsFormsApp1
                     }
                 }
 
-                if ((Math.Abs(players[i].CenterLeft - CenterLeft) < 10) && (Math.Abs(players[i].CenterTop - CenterTop) < 10))
+                //if ((Math.Abs(players[i].CenterLeft - CenterLeft) < 10) && (Math.Abs(players[i].CenterTop - CenterTop) < 10))
+                if (Polygon.IsCover(players[i].Polygon))
                 {
                     isStatemate[order] = true;
                     players[i].PlayerLabel.Text = $"{players[i].PlayerName} {players[i].CombatForceLevel.ToString()} " +
@@ -910,7 +932,7 @@ namespace WindowsFormsApp1
                     if (fingerGuessWin[order] == 1)
                     {
                         HitPoint = 510;
-                        players[i].KilledBy = this;
+                        players[i].HitPoint = 0;
                     }
                     isStatemate[order] = false;
                 }
@@ -937,7 +959,6 @@ namespace WindowsFormsApp1
                 IsAlive = false;
             }
         }
-
     }
 
     public class Ozone : Player
@@ -993,32 +1014,15 @@ namespace WindowsFormsApp1
             }
         }
 
-        public void Radius(Player player, int survivalTime)
+        public void Radius(Player player)
         {
             double length = Math.Sqrt(Math.Pow(player.PlayerLabel.Left - PlayerLabel.Left, 2) + Math.Pow(player.PlayerLabel.Top - PlayerLabel.Top, 2));
-            player.HitPoint -= Convert.ToInt32(HitPoint / 6 * Math.Exp(-length / 1000));
+            player.HitPoint -= Convert.ToInt32(HitPoint / 200 * Math.Exp(-length / 50));
 
-            if (HitPoint <= 0 && IsAlive)
-            {
-                KilledBy = player;
-                return;
-            }
-            else if (player.HitPoint <= 0 && player.IsAlive)
+            if (player.HitPoint <= 0 && player.IsAlive)
             {
                 player.KilledBy = this;
             }
-
-
-            // 再次结算
-            //if (player.HitPoint <= 0 && player.IsAlive)
-            //{
-            //    player.SurvivalTime = survivalTime;
-            //    player.SurvivalRank = PlayerRemainedNumber;
-            //    KillNumber++;
-            //    player.KilledBy = PlayerName;
-            //    player.IsAlive = false;
-            //}
         }
-
     }
 }

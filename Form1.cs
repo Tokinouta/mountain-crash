@@ -44,18 +44,19 @@ namespace WindowsFormsApp1
             // horisontal: form width = max object width - 18
             // vertical: form height = max object height - 48
             textBox1.Text = 3.ToString();
-            MountainNumber.Text = 1.ToString();
-            RiverNumber.Text = 1.ToString();
-            ClinicNumber.Text = 10.ToString();
-            PitNumber.Text = 10.ToString();
-            proprietorExists.Checked = true;
-            eggExists.Checked = true;
-            elfExists.Checked = true;
-            hatExists.Checked = true;
-            ozoneExists.Checked = true;
+            //MountainNumber.Text = 1.ToString();
+            //RiverNumber.Text = 1.ToString();
+            //ClinicNumber.Text = 10.ToString();
+            //PitNumber.Text = 10.ToString();
+            //proprietorExists.Checked = true;
+            //eggExists.Checked = true;
+            //elfExists.Checked = true;
+            //hatExists.Checked = true;
+            //ozoneExists.Checked = true;
             combatForceOptions.SelectedIndex = 2;
             killOptions.SelectedIndex = 2;
 
+            label1.Text = "";
             if (killOptions.SelectedIndex < 0)
             {
                 MessageBox.Show("Please choose kill options", "Warning: No choice of kill options");
@@ -77,10 +78,16 @@ namespace WindowsFormsApp1
             BattleField.Visible = true;
 
             int Temp;
-            if (!int.TryParse(textBox1.Text, out Temp))
+            if (!int.TryParse(textBox1.Text, out Temp) || Temp == 0)
             {
                 textBox1.Text = "Invalid input";
+                MountainNumber.SelectAll();
                 MessageBox.Show("Invalid player number");
+                BattleField.Refresh();
+                BattleField.Controls.Clear();
+                BattleField.Visible = false;
+                groupBox1.Visible = true;
+                groupBox2.Visible = true;
                 return;
             }
             else
@@ -136,14 +143,22 @@ namespace WindowsFormsApp1
                     players.Add(ozone);
                 }
             }// player number
+
             if (!int.TryParse(MountainNumber.Text, out Temp))
             {
-                MountainNumber.Text = "Invalid input";
                 MessageBox.Show("Invalid mountain number");
+                BattleField.Refresh();
+                BattleField.Controls.Clear();
+                BattleField.Visible = false;
+                groupBox1.Visible = true;
+                groupBox2.Visible = true;
+                MountainNumber.Text = "Invalid input";
+                MountainNumber.SelectAll();
                 return;
             }
             else
             {
+                Temp = Temp <= 0 ? 1 : Temp;
                 mountains = new Mountain[Temp];
                 double switchL = 5 * (Math.Atan(-Temp / 10) / 2 + Math.PI / 4);
                 for (int i = 0; i < Temp; i++)
@@ -154,12 +169,19 @@ namespace WindowsFormsApp1
             }// Mountain
             if (!int.TryParse(RiverNumber.Text, out Temp))
             {
-                RiverNumber.Text = "Invalid input";
                 MessageBox.Show("Invalid river number");
+                BattleField.Refresh();
+                BattleField.Controls.Clear();
+                BattleField.Visible = false;
+                groupBox1.Visible = true;
+                groupBox2.Visible = true;
+                RiverNumber.Text = "Invalid input";
+                MountainNumber.SelectAll();
                 return;
             }
             else
             {
+                Temp = Temp <= 0 ? 1 : Temp;
                 rivers = new River[Temp];
                 double switchL = 5 * (Math.Atan(-Temp / 10) / 8 + Math.PI / 16);
                 for (int i = 0; i < Temp; i++)
@@ -169,12 +191,19 @@ namespace WindowsFormsApp1
             }// River
             if (!int.TryParse(ClinicNumber.Text, out Temp))
             {
-                ClinicNumber.Text = "Invalid input";
                 MessageBox.Show("Invalid clinic number");
+                BattleField.Refresh();
+                BattleField.Controls.Clear();
+                BattleField.Visible = false;
+                groupBox1.Visible = true;
+                groupBox2.Visible = true;
+                ClinicNumber.Text = "Invalid input";
+                MountainNumber.SelectAll();
                 return;
             }
             else
             {
+                Temp = Temp <= 0 ? 1 : Temp;
                 clinics = new Clinic[Temp];
                 Clinic.NumberOfClinic = Temp;
                 for (int i = 0; i < Temp; i++)
@@ -184,12 +213,19 @@ namespace WindowsFormsApp1
             }// Clinic
             if (!int.TryParse(PitNumber.Text, out Temp))
             {
-                PitNumber.Text = "Invalid input";
                 MessageBox.Show("Invalid pit number");
+                BattleField.Refresh();
+                BattleField.Controls.Clear();
+                BattleField.Visible = false;
+                groupBox1.Visible = true;
+                groupBox2.Visible = true;
+                PitNumber.Text = "Invalid input";
+                MountainNumber.SelectAll();
                 return;
             }
             else
             {
+                Temp = Temp <= 0 ? 1 : Temp;
                 pits = new Pit[Temp];
                 for (int i = 0; i < Temp; i++)
                 {
@@ -224,6 +260,7 @@ namespace WindowsFormsApp1
             generation.Enabled = false;
             start.Enabled = false;
             pause.Enabled = true;
+            pause.Text = "Continue";
             clear.Enabled = true;
 
             TimeInSecond = 0;
@@ -235,7 +272,8 @@ namespace WindowsFormsApp1
             }
             if (elf != null)
             {
-                elf.TimerOfProtection.Enabled = true;
+                //elf.TimerOfProtection.Enabled = true;
+                elf.TimerOfRecharge.Enabled = true;
             }
 
             isStarted = true;
@@ -264,6 +302,7 @@ namespace WindowsFormsApp1
             groupBox1.Visible = true;
             groupBox2.Visible = true;
             timer.Enabled = false;
+            timerForBattle.Enabled = false;
             gamingTime.Text = "000:00";
             if (hat != null)
             {
@@ -272,7 +311,9 @@ namespace WindowsFormsApp1
             if (elf != null)
             {
                 elf.TimerOfProtection.Enabled = false;
+                elf.TimerOfRecharge.Enabled = false;
             }
+            label1.Text = "";
         }
 
         private void pause_Click(object sender, EventArgs e)
@@ -290,6 +331,7 @@ namespace WindowsFormsApp1
                 if (elf != null)
                 {
                     elf.TimerOfProtection.Enabled = false;
+                    elf.TimerOfRecharge.Enabled = false;
                 }
                 pause.Text = "Continue";
                 isStarted = false;
@@ -322,10 +364,8 @@ namespace WindowsFormsApp1
                     continue;
                 }
                 player.Move(BattleField);
-                //players[i].UpdateSpeed();
                 player.UpdateLabel();
             }
-
 
             foreach (var player1 in players)
             {
@@ -354,84 +394,167 @@ namespace WindowsFormsApp1
                 {
                     player1.CollapsedPit(pit, pits);
                 }
+            }
 
-                if (proprieter != null && proprieter.IsAlive)
-                {
-                    proprieter.FingerGame(players);
-                    foreach (var player2 in players)
-                    {
-                        if (proprieter != player2 && player2.IsAlive && player2.Polygon.IsCover(proprieter.Polygon))
-                        {
-                            proprieter.Settle(TimeInSecond);
-                            player2.UpdateColor(BattleField);
-                        }
-                    }
-                }
-
-                if (egg != null && egg.IsAlive)
-                {
-                    foreach (var player2 in players)
-                    {
-                        if (player2 != egg && player2.IsAlive && !egg.IsInEarth)
-                        {
-                            egg.GetIntoEarth(player2);
-                            if (egg.HitPoint > 0)
-                            {
-                                egg.Settle(TimeInSecond);
-                            }
-                            egg.UpdateColor(BattleField);
-                        }
-                    }
-                }
-
+            if (proprieter != null && proprieter.IsAlive)
+            {
+                proprieter.FingerGame(players);
                 foreach (var player2 in players)
                 {
-                    if (player1 != player2 && player2.IsAlive && player1.IsAlive)
+                    if (proprieter != player2 && player2.Polygon.IsCover(proprieter.Polygon))
                     {
-                        player1.Battle(player2, killOptions);
-                        player1.Settle(TimeInSecond);
+                        proprieter.Settle(TimeInSecond);
                         player2.Settle(TimeInSecond);
+                        player2.UpdateColor(BattleField);
                     }
-                    player1.UpdateColor(BattleField);
                 }
+            }
 
+            if (egg != null && egg.IsAlive)
+            {
+                foreach (var player2 in players)
+                {
+                    if (player2 != egg && player2.IsAlive && !egg.IsInEarth)
+                    {
+                        egg.GetIntoEarth(player2);
+                        if (egg.HitPoint > 0)
+                        {
+                            egg.Settle(TimeInSecond);
+                        }
+                        egg.UpdateColor(BattleField);
+                    }
+                }
+            }
+
+            if (ozone != null && ozone.IsAlive)
+            {
+                foreach (var player2 in players)
+                {
+                    if (player2 != ozone && player2.IsAlive)
+                    {
+                        ozone.Radius(player2);
+                        player2.Settle(TimeInSecond);
+                        player2.UpdateColor(BattleField);
+                    }
+                }
             }
 
 
-            playerRemained.Text = Player.PlayerRemainedNumber.ToString();
-            //if (Player.PlayerRemainedNumber <= 1)
-            //{
-            //    timerForBattle.Enabled = false;
+            foreach (var player1 in players)
+            { 
+                foreach (var player2 in players)
+                {
+                    if (player1 == proprieter)
+                    {
+                        player1.Settle(TimeInSecond);
+                        player1.UpdateColor(BattleField);
+                        continue;
+                    }
+                    else
+                    {
+                        if (player1 != player2 && player2 != proprieter && player2.IsAlive && player1.IsAlive)
+                        {
+                            player1.Battle(player2, killOptions);
+                            player1.Settle(TimeInSecond);
+                            player2.Settle(TimeInSecond);
+                        }
+                        player1.UpdateColor(BattleField);
+                    }
+                }
+            }
 
-            //    return;
-            //}
+            playerRemained.Text = Player.PlayerRemainedNumber.ToString();
+            if (Player.PlayerRemainedNumber <= 1 && isStarted)
+            {
+                if (hat != null)
+                {
+                    hat.TimerCountDown.Enabled = false;
+                }
+                if (elf != null)
+                {
+                    elf.TimerOfProtection.Enabled = false;
+                    elf.TimerOfRecharge.Enabled = false;
+                }
+                if (egg != null)
+                {
+                    egg.GettingIntoEarth.Enabled = false;
+                }
+
+                BattleField.Refresh();
+                BattleField.Controls.Clear();
+                BattleField.Visible = false;
+
+                generation.Enabled = true;
+                start.Enabled = false;
+                pause.Enabled = false;
+                isGenerated = false;
+                isStarted = false;
+
+                groupBox1.Visible = true;
+                groupBox2.Visible = true;
+                timer.Enabled = false;
+
+                players.Sort();
+                players[0].SurvivalTime = TimeInSecond;
+                players[0].SurvivalRank = 1;
+                foreach (var player in players)
+                {
+                    label1.Text += player.ShowInfo();
+                }
+
+                timerForBattle.Enabled = false;
+            }
+        }
+
+        private void UpdateSpeed_Tick(object sender, EventArgs e)
+        {
+            foreach (var player in players)
+            {
+                player.UpdateSpeed();
+            }
         }
 
         private void BattleField_Paint(object sender, PaintEventArgs e)
         {
             Graphics DrawBarriers = e.Graphics;
             Pen DrawMountainPen = new Pen(Brushes.Black, 2);
-            foreach (var mount in mountains)
-                DrawBarriers.DrawLine(DrawMountainPen, mount.StartPoint, mount.EndPoint);
+            if (mountains != null)
+            {
+                foreach (var mount in mountains)
+                {
+                    DrawBarriers.DrawLine(DrawMountainPen, mount.StartPoint, mount.EndPoint);
+                }
+            }
 
             Pen DrawRiverPen = new Pen(Brushes.Azure, 2);
-            foreach (var river in rivers)
-                DrawBarriers.DrawLine(DrawRiverPen, river.StartPoint, river.EndPoint);
+            if (rivers != null)
+            {
+                foreach (var river in rivers)
+                {
+                    DrawBarriers.DrawLine(DrawRiverPen, river.StartPoint, river.EndPoint);
+                }
+            }
 
             Pen DrawClinicPen = new Pen(Brushes.Chocolate, 2);
             Brush DrawClinicBrush = new SolidBrush(Color.Cornsilk);
-            foreach (var clinic in clinics)
+            if (clinics != null)
             {
-                DrawBarriers.DrawRectangle(DrawClinicPen, clinic.Left, clinic.Top, clinic.Width, clinic.Height);
-                DrawBarriers.FillRectangle(DrawClinicBrush, clinic.Left, clinic.Top, clinic.Width, clinic.Height);
+                foreach (var clinic in clinics)
+                {
+                    DrawBarriers.DrawRectangle(DrawClinicPen, clinic.Left, clinic.Top, clinic.Width, clinic.Height);
+                    DrawBarriers.FillRectangle(DrawClinicBrush, clinic.Left, clinic.Top, clinic.Width, clinic.Height);
+                }
             }
 
             Pen DrawPitPen = new Pen(Brushes.DarkSeaGreen, 2);
             Brush DrawPitBrush = new SolidBrush(Color.MintCream);
-            foreach (var pit in pits)
+            if (pits != null)
             {
-                DrawBarriers.DrawRectangle(DrawPitPen, pit.Left, pit.Top, pit.Width, pit.Height);
-                DrawBarriers.FillRectangle(DrawPitBrush, pit.Left, pit.Top, pit.Width, pit.Height);
+                foreach (var pit in pits)
+                {
+                    DrawBarriers.DrawRectangle(DrawPitPen, pit.Left, pit.Top, pit.Width, pit.Height);
+                    DrawBarriers.FillRectangle(DrawPitBrush, pit.Left, pit.Top, pit.Width, pit.Height);
+                }
             }
         }
 
@@ -441,6 +564,5 @@ namespace WindowsFormsApp1
             TimeInMinute = Convert.ToInt32(Math.Floor(Convert.ToDouble(TimeInSecond) / 60));
             gamingTime.Text = $"{TimeInMinute:D3}:{TimeInSecond % 60:D2}";
         }
-
     }
 }
