@@ -59,7 +59,7 @@ namespace WindowsFormsApp1
         int bonus;
 
         string playerName;
-        string killedBy;
+        Player killedBy;
 
         Label playerLabel;
         Polygon polygon;
@@ -78,6 +78,7 @@ namespace WindowsFormsApp1
             survivalTime = 0;
             score = 0;
             killNumber = 0;
+            killedBy = null;
             survivalRank = 0;
             scoreRank = 0;
             timeScore = 0;
@@ -148,6 +149,7 @@ namespace WindowsFormsApp1
             survivalTime = 0;
             score = 0;
             killNumber = 0;
+            killedBy = null;
             survivalRank = 0;
             scoreRank = creatingOrder;
             timeScore = 0;
@@ -198,7 +200,7 @@ namespace WindowsFormsApp1
         public int Bonus { get => bonus; set => bonus = value; }
         public double SurvivalTime { get => survivalTime; set => survivalTime = value; }
         public string PlayerName { get => playerName; set => playerName = value; }
-        public string KilledBy { get => killedBy; set => killedBy = value; }
+        public Player KilledBy { get => killedBy; set => killedBy = value; }
         public double Speed { get => Math.Sqrt(Math.Pow(SpeedOfX, 2) + Math.Pow(SpeedOfY, 2)); }
         public int CreatingOrder { get => creatingOrder; set => creatingOrder = value; }
 
@@ -279,11 +281,11 @@ namespace WindowsFormsApp1
                 }
                 if (HitPoint <= 0 && IsAlive)
                 {
-                    KilledBy = player.PlayerName;
+                    KilledBy = player;
                 }
                 else if (player.HitPoint <= 0 && player.IsAlive)
                 {
-                    player.KilledBy = PlayerName;
+                    player.KilledBy = this;
                 }
             }
         }
@@ -294,30 +296,16 @@ namespace WindowsFormsApp1
         }
 
         //'结算幸存时间、殉职排名、殉职人数、交战得分、被殉职
-        public void Settle(Player player, int survivalTime)
+        public void Settle(int survivalTime)
         {
             if (HitPoint <= 0 && IsAlive) 
             {
                 SurvivalTime = survivalTime;
                 SurvivalRank = PlayerRemainedNumber;
-                player.KillNumber++;
-                player.AttackScore += Convert.ToInt32(300 * Math.Sqrt(1 / 300 * survivalTime));
-                KilledBy = player.PlayerName;
+                killedBy.KillNumber++;
+                killedBy.AttackScore += Convert.ToInt32(300 * Math.Sqrt(1 / 300 * survivalTime));
                 IsAlive = false;
                 if (playerRemainedNumber != 0 && IsPlayer())
-                {
-                    PlayerRemainedNumber--;
-                }
-            }
-            else if (player.HitPoint <= 0 && player.IsAlive)
-            {
-                player.SurvivalTime = survivalTime;
-                player.SurvivalRank = PlayerRemainedNumber;
-                KillNumber++;
-                attackScore += Convert.ToInt32(300 * Math.Sqrt(1 / 300 * survivalTime));
-                player.KilledBy = PlayerName;
-                player.IsAlive = false;
-                if (playerRemainedNumber != 0 && player.IsPlayer())
                 {
                     PlayerRemainedNumber--;
                 }
@@ -568,29 +556,16 @@ namespace WindowsFormsApp1
         public Player PlayerKilledHat { get => playerKilledHat; set => playerKilledHat = value; }
         public System.Windows.Forms.Timer TimerCountDown { get => timerCountDown; set => timerCountDown = value; }
 
-        public new void Settle(Player player, int survivalTime)
+        public new void Settle(int survivalTime)
         {
-            if (player.HitPoint <= 0 && player.IsAlive)
-            {
-                player.SurvivalTime = survivalTime;
-                player.SurvivalRank = PlayerRemainedNumber;
-                KillNumber++;
-                player.KilledBy = PlayerName;
-                player.IsAlive = false;
-                if (PlayerRemainedNumber != 0 && player.IsPlayer())
-                {
-                    PlayerRemainedNumber--;
-                }
-            }
-            else if (HitPoint <= 0 && IsAlive)
+            if (HitPoint <= 0 && IsAlive)
             {
                 SurvivalTime = survivalTime;
-                player.Bonus += 500;
-                KilledBy = player.PlayerName;
+                KilledBy.Bonus += 500;
                 IsAlive = false;
-                player.HitPoint = 510;
-                player.CombatForceLevel = 12;
-                playerKilledHat = player;
+                KilledBy.HitPoint = 510;
+                KilledBy.CombatForceLevel = 12;
+                playerKilledHat = KilledBy;
                 timerCountDown.Enabled = true;
             }
         }
@@ -661,28 +636,15 @@ namespace WindowsFormsApp1
         public Timer TimerOfProtection { get; set; }
         public Timer TimerOfRecharge { get; set; }
 
-        public new void Settle(Player player, int survivalTime)
+        public new void Settle(int survivalTime)
         {
-            if (player.HitPoint <= 0 && player.IsAlive)
-            {
-                player.SurvivalTime = survivalTime;
-                player.SurvivalRank = PlayerRemainedNumber;
-                KillNumber++;
-                player.KilledBy = PlayerName;
-                player.IsAlive = false;
-                if (PlayerRemainedNumber != 0 && player.IsPlayer())
-                {
-                    PlayerRemainedNumber--;
-                }
-            }
-            else if (HitPoint <= 0 && IsAlive)
+            if (HitPoint <= 0 && IsAlive)
             {
                 SurvivalTime = survivalTime;
-                player.Bonus += 200;
-                KilledBy = player.PlayerName;
+                KilledBy.Bonus += 200;
                 IsAlive = false;
-                player.HitPoint = 510;
-                playerProtectedByElf = player;
+                KilledBy.HitPoint = 510;
+                playerProtectedByElf = KilledBy;
                 TimerOfProtection.Enabled = true;
                 TimerOfRecharge.Enabled = false;
             }
@@ -720,10 +682,20 @@ namespace WindowsFormsApp1
         {
             if (Polygon.IsCover(player.Polygon))
             {
+                HitPoint -= Convert.ToInt32(player.CombatForceLevel / 2);
+                if (HitPoint <= 0 && IsAlive)
+                {
+                    KilledBy = player;
+                }
+                else if (player.HitPoint <= 0 && player.IsAlive)
+                {
+                    player.KilledBy = this;
+                }
                 PlayerLabel.Visible = false;
                 IsAlive = false;
                 IsInEarth = true;
                 GettingIntoEarth.Enabled = true;
+
                 //PlayerLabel.Visible = false;
                 //Thread thread = new Thread(returnCB);
                 //thread.IsBackground = true;
@@ -731,7 +703,7 @@ namespace WindowsFormsApp1
                 //var t = Task.Run(delegate
                 //{
                 //    Task.Delay(2000);     
-                //    HitPoint -= Convert.ToInt32(player.CombatForceLevel / 2);
+                //    
                 //});
                 //PlayerLabel.Visible = true;
             }
@@ -761,25 +733,12 @@ namespace WindowsFormsApp1
             GettingIntoEarth.Enabled = false;
         }
 
-        public new void Settle(Player player, int survivalTime)
+        public new void Settle(int survivalTime)
         {
-            if (player.HitPoint <= 0 && player.IsAlive)
-            {
-                player.SurvivalTime = survivalTime;
-                player.SurvivalRank = PlayerRemainedNumber;
-                KillNumber++;
-                player.KilledBy = PlayerName;
-                player.IsAlive = false;
-                if (PlayerRemainedNumber != 0 && player.IsPlayer())
-                {
-                    PlayerRemainedNumber--;
-                }
-            }
-            else if (HitPoint <= 0 && IsAlive)
+            if (HitPoint <= 0 && IsAlive)
             {
                 SurvivalTime = survivalTime;
-                player.Bonus += 200;
-                KilledBy = player.PlayerName;
+                KilledBy.Bonus += 200;
                 IsAlive = false;
             }
         }
@@ -867,7 +826,7 @@ namespace WindowsFormsApp1
             Random random = new Random(Guid.NewGuid().GetHashCode());
 
             fistProprieter = random.Next(3);
-            PlayerLabel.Text = $"{PlayerName} {CombatForceLevel} " +
+            PlayerLabel.Text = $"{PlayerName} {CombatForceLevel.ToString()} " +
                 $"{(fistProprieter == 0 ? "剪刀" : fistProprieter == 1 ? "石头" : "布")}";
             for (int i = 0; i < PlayerNumber;++i)
             {
@@ -915,12 +874,13 @@ namespace WindowsFormsApp1
 
                 if ((Math.Abs(players[i].CenterLeft - CenterLeft) < 10) && (Math.Abs(players[i].CenterTop - CenterTop) < 10))
                 {
-                    PlayerLabel.Text = $"{players[i].PlayerName} {players[i].CombatForceLevel} " +
+                    isStatemate[order] = true;
+                    players[i].PlayerLabel.Text = $"{players[i].PlayerName} {players[i].CombatForceLevel.ToString()} " +
                         $"{(fingerGuessState[order] == 0 ? "剪刀" : fingerGuessState[order] == 1 ? "石头" : "布")}";
                 } 
                 else
                 {
-                    PlayerLabel.Text = $"{players[i].PlayerName} {players[i].CombatForceLevel} ";
+                    players[i].PlayerLabel.Text = $"{players[i].PlayerName} {players[i].CombatForceLevel.ToString()} ";
                     isStatemate[order] = false;
                 }
 
@@ -940,39 +900,40 @@ namespace WindowsFormsApp1
                 {
                     fingerGuessWin[order] = 0;
                 }
+
+                if (isStatemate[order])
+                {
+                    if (fingerGuessWin[order] == -1)
+                    {
+                        HitPoint -= 38;
+                    }
+                    if (fingerGuessWin[order] == 1)
+                    {
+                        HitPoint = 510;
+                        players[i].KilledBy = this;
+                    }
+                    isStatemate[order] = false;
+                }
+
+
+                if (HitPoint <= 0 && IsAlive)
+                {
+                    KilledBy = players[i];
+                    return;
+                }
+                else if (players[i].HitPoint <= 0 && players[i].IsAlive)
+                {
+                    players[i].KilledBy = this;
+                }
             }
         }
 
-        public new void Settle(Player player, int survivalTime)
+        public new void Settle(int survivalTime)
         {
-            int order = player.CreatingOrder;
-
-            if (!isStatemate[order])
-            {
-                if (fingerGuessWin[order] == -1)
-                {
-                    HitPoint -= 38;
-                }
-                if (fingerGuessWin[order] == 1)
-                {
-                    player.HitPoint = 0;
-                    HitPoint = 510;
-                    player.SurvivalTime = survivalTime;
-                    player.SurvivalRank = PlayerRemainedNumber;
-                    player.KilledBy = PlayerName;
-                    player.IsAlive = false;
-                    if (PlayerRemainedNumber != 0 && player.IsPlayer())
-                    {
-                        PlayerRemainedNumber--;
-                    }
-                }
-                isStatemate[order] = true;
-            }
-            else if (HitPoint <= 0 && IsAlive)
+            if (HitPoint <= 0 && IsAlive)
             {
                 SurvivalTime = survivalTime;
-                player.Bonus += 200;
-                KilledBy = player.PlayerName;
+                KilledBy.Bonus += 200;
                 IsAlive = false;
             }
         }
@@ -1019,28 +980,15 @@ namespace WindowsFormsApp1
             Random random = new Random(Guid.NewGuid().GetHashCode());
 
             CombatForceLevel = random.Next(6) + combatForceOptions.SelectedIndex == 2 ? 1 : 0.5; //'战力相同
-            PlayerLabel.Text = $"臭氧加速器 {CombatForceLevel.ToString()}";
+            PlayerLabel.Text = $"{PlayerName} {CombatForceLevel.ToString()}";
         }
 
-        public new void Settle(Player player, int survivalTime)
+        public new void Settle(int survivalTime)
         {
-            if (player.HitPoint <= 0 && player.IsAlive)
-            {
-                player.SurvivalTime = survivalTime;
-                player.SurvivalRank = PlayerRemainedNumber;
-                KillNumber++;
-                player.KilledBy = PlayerName;
-                player.IsAlive = false;
-                if (PlayerRemainedNumber != 0 && player.IsPlayer())
-                {
-                    PlayerRemainedNumber--;
-                }
-            }
-            else if (HitPoint <= 0 && IsAlive)
+            if (HitPoint <= 0 && IsAlive)
             {
                 SurvivalTime = survivalTime;
-                player.Bonus += 200;
-                KilledBy = player.PlayerName;
+                KilledBy.Bonus += 200;
                 IsAlive = false;
             }
         }
@@ -1050,15 +998,26 @@ namespace WindowsFormsApp1
             double length = Math.Sqrt(Math.Pow(player.PlayerLabel.Left - PlayerLabel.Left, 2) + Math.Pow(player.PlayerLabel.Top - PlayerLabel.Top, 2));
             player.HitPoint -= Convert.ToInt32(HitPoint / 6 * Math.Exp(-length / 1000));
 
-            // 再次结算
-            if (player.HitPoint <= 0 && player.IsAlive)
+            if (HitPoint <= 0 && IsAlive)
             {
-                player.SurvivalTime = survivalTime;
-                player.SurvivalRank = PlayerRemainedNumber;
-                KillNumber++;
-                player.KilledBy = PlayerName;
-                player.IsAlive = false;
+                KilledBy = player;
+                return;
             }
+            else if (player.HitPoint <= 0 && player.IsAlive)
+            {
+                player.KilledBy = this;
+            }
+
+
+            // 再次结算
+            //if (player.HitPoint <= 0 && player.IsAlive)
+            //{
+            //    player.SurvivalTime = survivalTime;
+            //    player.SurvivalRank = PlayerRemainedNumber;
+            //    KillNumber++;
+            //    player.KilledBy = PlayerName;
+            //    player.IsAlive = false;
+            //}
         }
 
     }

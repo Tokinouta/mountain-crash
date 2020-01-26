@@ -362,8 +362,24 @@ namespace WindowsFormsApp1
                     {
                         if (proprieter != player2 && player2.IsAlive && player2.Polygon.IsCover(proprieter.Polygon))
                         {
-                            proprieter.Settle(player2, TimeInSecond);
+                            proprieter.Settle(TimeInSecond);
                             player2.UpdateColor(BattleField);
+                        }
+                    }
+                }
+
+                if (egg != null && egg.IsAlive)
+                {
+                    foreach (var player2 in players)
+                    {
+                        if (player2 != egg && player2.IsAlive && !egg.IsInEarth)
+                        {
+                            egg.GetIntoEarth(player2);
+                            if (egg.HitPoint > 0)
+                            {
+                                egg.Settle(TimeInSecond);
+                            }
+                            egg.UpdateColor(BattleField);
                         }
                     }
                 }
@@ -373,17 +389,8 @@ namespace WindowsFormsApp1
                     if (player1 != player2 && player2.IsAlive && player1.IsAlive)
                     {
                         player1.Battle(player2, killOptions);
-                        player1.Settle(player2, TimeInSecond);
-                    }
-                    player1.UpdateColor(BattleField);
-                }
-
-                foreach (var player2 in players)
-                {
-                    if (egg != null && player1 == egg && player2 != egg && player2.IsAlive && !egg.IsInEarth)
-                    {
-                        egg.GetIntoEarth(player2);
-                        player1.Settle(player2, TimeInSecond);
+                        player1.Settle(TimeInSecond);
+                        player2.Settle(TimeInSecond);
                     }
                     player1.UpdateColor(BattleField);
                 }
