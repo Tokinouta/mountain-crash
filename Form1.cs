@@ -13,7 +13,7 @@ namespace WindowsFormsApp1
 {
     public partial class Form1 : Form
     {
-        List<Player> players = null;
+        PlayerGroup players = null;
         Mountain[] mountains = null;
         River[] rivers = null;
         Clinic[] clinics = null;
@@ -52,18 +52,18 @@ namespace WindowsFormsApp1
         {
             // horisontal: form width = max object width - 18
             // vertical: form height = max object height - 48
-            textBox1.Text = 3.ToString();
-            MountainNumber.Text = 1.ToString();
-            RiverNumber.Text = 1.ToString();
-            ClinicNumber.Text = 10.ToString();
-            PitNumber.Text = 10.ToString();
-            proprietorExists.Checked = true;
-            eggExists.Checked = true;
-            elfExists.Checked = true;
-            hatExists.Checked = true;
-            ozoneExists.Checked = true;
-            combatForceOptions.SelectedIndex = 2;
-            killOptions.SelectedIndex = 3;
+            // textBox1.Text = 3.ToString();
+            //MountainNumber.Text = 1.ToString();
+            //RiverNumber.Text = 1.ToString();
+            //ClinicNumber.Text = 10.ToString();
+            //PitNumber.Text = 10.ToString();
+            //proprietorExists.Checked = true;
+            //eggExists.Checked = true;
+            //elfExists.Checked = true;
+            //hatExists.Checked = true;
+            //ozoneExists.Checked = true;
+            //combatForceOptions.SelectedIndex = 0;
+            //killOptions.SelectedIndex = 2;
 
             label1.Text = "";
             if (killOptions.SelectedIndex < 0)
@@ -87,7 +87,7 @@ namespace WindowsFormsApp1
             BattleField.Visible = true;
 
             #region player initialization
-            players = new List<Player>();
+            players = new PlayerGroup();
             StreamReader PlayerName;
             try
             {
@@ -112,6 +112,12 @@ namespace WindowsFormsApp1
                 nameTemp = PlayerName.ReadToEnd();
             }
             string[] names = nameTemp.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            if (names.Length <= 1)
+            {
+                MessageBox.Show("请添加至少2名玩家。", "玩家太少啦");
+                CleanUp();
+                return;
+            }
             Player.PlayerNumber = names.Length;
             Player.PlayerRemainedNumber = names.Length;
             foreach (var name in names)
@@ -121,42 +127,35 @@ namespace WindowsFormsApp1
                     PlayerName = name
                 };
                 p.PlayerLabel.Text = $"{ p.PlayerName} {p.CombatForceLevel.ToString()}";
-                p.LocationChanged += new LocationChangedEventHandler(Moved);
-                players.Add(p);
+                players.AddPlayer(p);
                 ++order;
             }
             PlayerName.Close();
-            Player.CombatForceLevelCache = new double[Player.PlayerNumber / 4];
 
             if (proprietorExists.Checked)
             {
                 proprieter = new Proprieter(BattleField);
-                proprieter.LocationChanged += new LocationChangedEventHandler(Moved);
-                players.Add(proprieter);
+                players.AddPlayer(proprieter);
             }
             if (eggExists.Checked)
             {
                 egg = new Egg(BattleField);
-                egg.LocationChanged += new LocationChangedEventHandler(Moved);
-                players.Add(egg);
+                players.AddPlayer(egg);
             }
             if (elfExists.Checked)
             {
                 elf = new Elf(BattleField);
-                elf.LocationChanged += new LocationChangedEventHandler(Moved);
-                players.Add(elf);
+                players.AddPlayer(elf);
             }
             if (hatExists.Checked)
             {
                 hat = new Hat(combatForceOptions.SelectedIndex, BattleField);
-                hat.LocationChanged += new LocationChangedEventHandler(Moved);
-                players.Add(hat);
+                players.AddPlayer(hat);
             }
             if (ozoneExists.Checked)
             {
                 ozone = new Ozone(combatForceOptions.SelectedIndex, BattleField);
-                ozone.LocationChanged += new LocationChangedEventHandler(Moved);
-                players.Add(ozone);
+                players.AddPlayer(ozone);
             }
             #endregion
 
@@ -236,10 +235,6 @@ namespace WindowsFormsApp1
             generation.Enabled = false;
             start.Enabled = true;
             clear.Enabled = true;
-        }
-        private void Moved(Player player, LocationChangedEventArgs e)
-        {
-            player.Polygon.Move(e.DisplacementX, e.DisplacementY);
         }
 
         private void start_Click(object sender, EventArgs e)
@@ -354,7 +349,7 @@ namespace WindowsFormsApp1
 
         private void timer1_Tick_1(object sender, EventArgs e)
         {
-            foreach (var player in players)
+            foreach (var player in players.PlayerList)
             {
                 if (!player.IsAlive)
                 {
@@ -364,7 +359,7 @@ namespace WindowsFormsApp1
                 player.UpdateLabel();
             }
 
-            foreach (var player1 in players)
+            foreach (var player1 in players.PlayerList)
             {
                 if (!player1.IsAlive)
                 {
@@ -395,8 +390,8 @@ namespace WindowsFormsApp1
 
             if (proprieter != null && proprieter.IsAlive)
             {
-                proprieter.FingerGame(players);
-                foreach (var player2 in players)
+                proprieter.FingerGame(players.PlayerList);
+                foreach (var player2 in players.PlayerList)
                 {
                     if (proprieter != player2 && player2.Polygon.IsCover(proprieter.Polygon))
                     {
@@ -409,7 +404,7 @@ namespace WindowsFormsApp1
 
             if (egg != null && egg.IsAlive)
             {
-                foreach (var player2 in players)
+                foreach (var player2 in players.PlayerList)
                 {
                     if (player2 != egg && player2.IsAlive && !egg.IsInEarth)
                     {
@@ -418,32 +413,29 @@ namespace WindowsFormsApp1
                         {
                             egg.Settle(TimeInSecond);
                         }
-                        egg.UpdateColor(BattleField);
                     }
                 }
             }
 
             if (ozone != null && ozone.IsAlive)
             {
-                foreach (var player2 in players)
+                foreach (var player2 in players.PlayerList)
                 {
                     if (player2 != ozone && player2.IsAlive)
                     {
                         ozone.Radius(player2);
                         player2.Settle(TimeInSecond);
-                        player2.UpdateColor(BattleField);
                     }
                 }
             }
 
-            foreach (var player1 in players)
+            foreach (var player1 in players.PlayerList)
             { 
-                foreach (var player2 in players)
+                foreach (var player2 in players.PlayerList)
                 {
                     if (player1 == proprieter)
                     {
                         player1.Settle(TimeInSecond);
-                        player1.UpdateColor(BattleField);
                         continue;
                     }
                     else
@@ -454,7 +446,6 @@ namespace WindowsFormsApp1
                             player1.Settle(TimeInSecond);
                             player2.Settle(TimeInSecond);
                         }
-                        player1.UpdateColor(BattleField);
                     }
                 }
             }
@@ -476,9 +467,6 @@ namespace WindowsFormsApp1
                     egg.GettingIntoEarth.Enabled = false;
                 }
 
-                BattleField.Refresh();
-                BattleField.Controls.Clear();
-                BattleField.Visible = false;
 
                 generation.Enabled = true;
                 start.Enabled = false;
@@ -486,14 +474,17 @@ namespace WindowsFormsApp1
                 isGenerated = false;
                 isStarted = false;
 
+                BattleField.Refresh();
+                BattleField.Controls.Clear();
+                BattleField.Visible = false;
                 groupBox1.Visible = true;
                 groupBox2.Visible = true;
                 timer.Enabled = false;
 
-                players.Sort();
-                players[0].SurvivalTime = TimeInSecond;
-                players[0].SurvivalRank = 1;
-                foreach (var player in players)
+                players.PlayerList.Sort();
+                players.PlayerList[0].SurvivalTime = TimeInSecond;
+                players.PlayerList[0].SurvivalRank = 1;
+                foreach (var player in players.PlayerList)
                 {
                     label1.Text += player.ShowInfo();
                 }
@@ -504,10 +495,11 @@ namespace WindowsFormsApp1
 
         private void UpdateSpeed_Tick(object sender, EventArgs e)
         {
-            foreach (var player in players)
+            foreach (var player in players.PlayerList)
             {
                 player.UpdateSpeed();
             }
+            players.UpdateBattleForceLevel(combatForceOptions);
         }
 
         private void Textbox_Click(object sender, EventArgs e)

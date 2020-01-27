@@ -16,7 +16,8 @@ using System.Threading.Tasks;
 
 namespace WindowsFormsApp1
 {
-    public delegate void LocationChangedEventHandler(Player player, LocationChangedEventArgs e);
+    //public delegate void LocationChangedEventHandler(Player player, LocationChangedEventArgs e);
+    //public delegate void HitPointChangedEventHandler(Player player, HitPointChangedEventArgs e);
 
     public class LocationChangedEventArgs : EventArgs
     {
@@ -31,12 +32,21 @@ namespace WindowsFormsApp1
         public double DisplacementX { get => displacementX; set => displacementX = value; }
         public double DisplacementY { get => displacementY; set => displacementY = value; }
     }
+    public class HitPointChangedEventArgs : EventArgs
+    {
+        public double HitPoint { get; set; }
+        public GroupBox Battlefield { get; set; }
+        public HitPointChangedEventArgs(double hitPoint, GroupBox battlefield)
+        {
+            HitPoint = hitPoint;
+            Battlefield = battlefield;
+        }
+    }
 
     public class Player : IComparable<Player>
     {
         static int playerNumber;
         static int playerRemainedNumber;
-        static double[] combatForceLevelCache;
 
         //sx、sy为玩家速度方向，lf为玩家横坐标排序，hp为玩家生命主，lv为玩家战力等级,alive为判断是否幸存标志
         double combatForceLevel;
@@ -64,6 +74,30 @@ namespace WindowsFormsApp1
         Label playerLabel;
         Polygon polygon;
 
+        public event EventHandler<LocationChangedEventArgs> LocationChanged;
+        public event EventHandler<HitPointChangedEventArgs> HitPointChanged;
+
+        //The event-invoking method that derived classes can override.
+        public virtual void OnHitPointChanged(HitPointChangedEventArgs e)
+        {
+            // Make a temporary copy of the event to avoid possibility of
+            // a race condition if the last subscriber unsubscribes
+            // immediately after the null check and before the event is raised.
+            EventHandler<HitPointChangedEventArgs> handler = HitPointChanged;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }   
+        public void OnLocationChanged(LocationChangedEventArgs e)
+        {
+            EventHandler<LocationChangedEventArgs> handler = LocationChanged;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
+        
         public Player(GroupBox BattleField)
         {
             Random random = new Random(Guid.NewGuid().GetHashCode());
@@ -92,14 +126,15 @@ namespace WindowsFormsApp1
                 Left = random.Next(BattleField.Width - 100),
                 BackColor = Color.Aquamarine
             };
+            this.BattleField = BattleField;
             BattleField.Controls.Add(playerLabel);
             Vector[] vectors = new Vector[] { new Vector(playerLabel.Left, playerLabel.Top),
                                               new Vector(playerLabel.Left, playerLabel.Bottom),
                                               new Vector(playerLabel.Right, playerLabel.Bottom),
                                               new Vector(playerLabel.Right, playerLabel.Top) };
             polygon = new Polygon(vectors);
+            OnHitPointChanged(new HitPointChangedEventArgs(hitPoint, BattleField));
         }
-
         public Player(int creatingOrder, int combatForceOption, GroupBox BattleField)
         {
             Random random = new Random(Guid.NewGuid().GetHashCode());
@@ -164,21 +199,22 @@ namespace WindowsFormsApp1
                 Left = random.Next(BattleField.Width - 100),
                 BackColor = Color.Aquamarine
             };
+            this.BattleField = BattleField;
             BattleField.Controls.Add(playerLabel);
             Vector[] vectors = new Vector[] { new Vector(playerLabel.Left, playerLabel.Top),
                                               new Vector(playerLabel.Left, playerLabel.Bottom),
                                               new Vector(playerLabel.Right, playerLabel.Bottom),
                                               new Vector(playerLabel.Right, playerLabel.Top) };
             polygon = new Polygon(vectors);
+            OnHitPointChanged(new HitPointChangedEventArgs(hitPoint, BattleField));
         }
 
-        public event LocationChangedEventHandler LocationChanged;
 
         #region Property
         public static int PlayerNumber { get => playerNumber; set => playerNumber = value; }
         public static int PlayerRemainedNumber { get => playerRemainedNumber; set => playerRemainedNumber = value; }
-        public static double[] CombatForceLevelCache { get => combatForceLevelCache; set => combatForceLevelCache = value; }
 
+        public GroupBox BattleField { get; set; }
         public int SpeedOfX { get => speedOfX; set => speedOfX = value; }
         public int SpeedOfY { get => speedOfY; set => speedOfY = value; }
         public int HorizontalOrder { get => horizontalOrder; set => horizontalOrder = value; }
@@ -240,9 +276,7 @@ namespace WindowsFormsApp1
             playerLabel.Left = playerLabel.Left < 0 ? BattleField.Width - playerLabel.Width :
                 (playerLabel.Left > BattleField.Width - playerLabel.Width ? 0 : playerLabel.Left);
 
-            LocationChangedEventArgs e = 
-                new LocationChangedEventArgs(playerLabel.Left - x, playerLabel.Top - y);
-            LocationChanged(this, e);
+            OnLocationChanged(new LocationChangedEventArgs(playerLabel.Left - x, playerLabel.Top - y));
         }
 
         public void Battle(Player player, ComboBox killOptions)
@@ -305,52 +339,8 @@ namespace WindowsFormsApp1
                         break;
                 }
 
-                //if (CombatForceLevel > player.CombatForceLevel)
-                //{
-                //    switch (killOptions.SelectedIndex)
-                //    {
-                //        case 0:
-                //            player.HitPoint -= 1;
-                //            break;
-                //        case 1:
-                //            player.HitPoint -= Convert.ToInt32(Math.Abs(CombatForceLevel - player.CombatForceLevel) / 2.5);
-                //            break;
-                //        case 2:
-                //            player.HitPoint -= Convert.ToInt32(CombatForceLevel);
-                //            HitPoint -= Convert.ToInt32(player.CombatForceLevel);
-                //            break;
-                //        case 3:
-                //            player.HitPoint -= Convert.ToInt32(Math.Abs(CombatForceLevel - player.CombatForceLevel) / 2.5);
-                //            if (player.HitPoint < 510 - Convert.ToInt32(Math.Abs(CombatForceLevel - player.CombatForceLevel) / 2.5))
-                //                HitPoint += Convert.ToInt32(Math.Abs(CombatForceLevel - player.CombatForceLevel) / 2.5);
-                //            break;
-                //        default:
-                //            break;
-                //    }
-                //}
-                //if (CombatForceLevel < player.CombatForceLevel)
-                //{
-                //    switch (killOptions.SelectedIndex)
-                //    {
-                //        case 0:
-                //            HitPoint -= 1;
-                //            break;
-                //        case 1:
-                //            player.HitPoint -= Convert.ToInt32(Math.Abs(player.CombatForceLevel - CombatForceLevel) / 2.5);
-                //            break;
-                //        case 2:
-                //            player.HitPoint -= Convert.ToInt32(CombatForceLevel / 8);
-                //            HitPoint -= Convert.ToInt32(player.CombatForceLevel / 8);
-                //            break;
-                //        case 3:
-                //            HitPoint -= Convert.ToInt32(Math.Abs(player.CombatForceLevel - CombatForceLevel) / 2.5);
-                //            if (HitPoint < 510 - Convert.ToInt32(Math.Abs(player.CombatForceLevel - CombatForceLevel) / 2.5))
-                //                player.HitPoint += Convert.ToInt32(Math.Abs(player.CombatForceLevel - CombatForceLevel) / 2.5);
-                //            break;
-                //        default:
-                //            break;
-                //    }
-                //}
+                OnHitPointChanged(new HitPointChangedEventArgs(hitPoint, BattleField));
+                player.OnHitPointChanged(new HitPointChangedEventArgs(player.HitPoint, BattleField));
 
                 if (HitPoint <= 0 && IsAlive)
                 {
@@ -398,7 +388,6 @@ namespace WindowsFormsApp1
             else
             {
                 BattleField.Controls.Remove(PlayerLabel);
-                //polygon = null;
             }
         }
 
@@ -412,50 +401,6 @@ namespace WindowsFormsApp1
         public void UpdateLabel()
         {
             playerLabel.Text = $"{playerName} {combatForceLevel.ToString()} {hitPoint.ToString()}";
-        }
-
-        public void UpdateBattleForceLevel(ComboBox combatForceOptions, Player[] players)
-        {
-            Random random = new Random(Guid.NewGuid().GetHashCode());
-
-            switch (combatForceOptions.SelectedIndex)//'战力相同随机
-            {
-                case 0:
-                    combatForceLevel = random.Next(1, 6);
-                    combatForceLevel *= random.Next(5) == 0 ? 2 : 1;
-                    break;
-
-                case 1:
-                    int quarter = combatForceLevelCache.Length / 4;
-                    if (creatingOrder < quarter)
-                    {
-                        combatForceLevelCache[creatingOrder] = players[creatingOrder].CombatForceLevel;
-                        combatForceLevel = players[creatingOrder + quarter].CombatForceLevel;
-                    }
-                    else if (creatingOrder < players.Length - quarter)
-                    {
-                        combatForceLevel = players[creatingOrder + quarter].CombatForceLevel;
-                    }
-                    else
-                    {
-                        combatForceLevel = combatForceLevelCache[quarter - combatForceLevelCache.Length + creatingOrder];
-                    }
-                    break;
-
-                case 2:
-                    double temp1 = random.NextDouble();
-                    double temp2 = random.NextDouble();
-                    combatForceLevel = random.Next(1, 6);
-                    if (combatForceLevel == 1 && temp1 > creatingOrder / playerNumber)
-                    {
-                        combatForceLevel = (temp2 < 1 / (5 + 5 * creatingOrder / (playerNumber - 1))) ? 12 : 6;
-                    }
-                    else
-                    {
-                        combatForceLevel *= (temp2 < 1 / (5 + 5 * creatingOrder / (playerNumber - 1))) ? 2 : 1;
-                    }
-                    break;
-            }
         }
 
         public string ShowInfo()
@@ -527,7 +472,7 @@ namespace WindowsFormsApp1
                 LocationChangedEventArgs e = new LocationChangedEventArgs(
                     (river.EndPoint.X - river.StartPoint.X) * Math.Sign(speedOfX),
                     (river.EndPoint.Y - river.StartPoint.Y) * Math.Sign(speedOfY));
-                LocationChanged(this, e);
+                OnLocationChanged(e);
             }
         }
 
@@ -545,6 +490,7 @@ namespace WindowsFormsApp1
                     if (hitPoint < 510 - playerRemainedNumber / (8 * Clinic.NumberOfClinic))
                         hitPoint += playerRemainedNumber / (8 * Clinic.NumberOfClinic);
                 }
+                OnHitPointChanged(new HitPointChangedEventArgs(hitPoint, BattleField));
             }
         }
 
@@ -567,9 +513,7 @@ namespace WindowsFormsApp1
                 bonus--; // 掉坑减分
                 
                 // 引起位置变化的地方都要触发LocationChanged事件
-                LocationChangedEventArgs e =
-                    new LocationChangedEventArgs(playerLabel.Left - x, playerLabel.Top - y);
-                LocationChanged(this, e);
+                OnLocationChanged(new LocationChangedEventArgs(playerLabel.Left - x, playerLabel.Top - y));
             }
         }
         #endregion
@@ -638,6 +582,11 @@ namespace WindowsFormsApp1
             timerCountDown.Tick += new EventHandler(timerCountDown_Tick);
         }
 
+        public override void OnHitPointChanged(HitPointChangedEventArgs e)
+        {
+            base.OnHitPointChanged(e);
+        }
+
         private void timerCountDown_Tick(object sender, EventArgs e)
         {
             countDown = countDown - 1;
@@ -646,6 +595,7 @@ namespace WindowsFormsApp1
             {
                 playerKilledHat.CombatForceLevel = 12;
                 playerKilledHat.HitPoint = 510;
+                OnHitPointChanged(new HitPointChangedEventArgs(playerKilledHat.HitPoint, BattleField));
             }
             else
             {
@@ -657,7 +607,7 @@ namespace WindowsFormsApp1
 
         public int CountDown { get => countDown; set => countDown = value; }
         public Player PlayerKilledHat { get => playerKilledHat; set => playerKilledHat = value; }
-        public System.Windows.Forms.Timer TimerCountDown { get => timerCountDown; set => timerCountDown = value; }
+        public Timer TimerCountDown { get => timerCountDown; set => timerCountDown = value; }
 
         public new void Settle(int survivalTime)
         {
@@ -703,9 +653,16 @@ namespace WindowsFormsApp1
             TimerOfRecharge.Tick += Recharge;
         }
 
+        public override void OnHitPointChanged(HitPointChangedEventArgs e)
+        {
+            base.OnHitPointChanged(e);
+        }
+
+
         private void Recharge(object sender, EventArgs e)
         {
             HitPoint = 510;
+            OnHitPointChanged(new HitPointChangedEventArgs(HitPoint, BattleField));
         }
 
         private void Protection(object sender, EventArgs e)
@@ -717,19 +674,25 @@ namespace WindowsFormsApp1
                 TimerOfProtection.Enabled = false;
                 periodOfRecharge = 60;
                 PlayerLabel.Visible = true;
+                double x = PlayerLabel.Left;
+                double y = PlayerLabel.Top;
                 PlayerLabel.Left = 0;
                 PlayerLabel.Top = random.Next();
+                OnLocationChanged(new LocationChangedEventArgs(PlayerLabel.Left - x, PlayerLabel.Top - y));
                 HitPoint = 510;
                 SpeedOfX = random.Next(-10, 10);
                 SpeedOfY = random.Next(-10, 10);
                 IsAlive = true;
                 playerProtectedByElf = null;
+                OnHitPointChanged(new HitPointChangedEventArgs(HitPoint, BattleField));
             }
             else
             {
                 if (playerProtectedByElf != null)
                 {
                     playerProtectedByElf.HitPoint = 510;
+                    playerProtectedByElf.OnHitPointChanged(
+                        new HitPointChangedEventArgs(playerProtectedByElf.HitPoint, BattleField));
                 }
             }
         }
@@ -781,11 +744,18 @@ namespace WindowsFormsApp1
 
         private delegate void GetIntoEarthCallback();
 
+        public override void OnHitPointChanged(HitPointChangedEventArgs e)
+        {
+            base.OnHitPointChanged(e);
+        }
+
+
         public void GetIntoEarth(Player player)
         {
             if (Polygon.IsCover(player.Polygon))
             {
                 HitPoint -= Convert.ToInt32(player.CombatForceLevel / 2);
+                OnHitPointChanged(new HitPointChangedEventArgs(HitPoint, BattleField));
                 if (HitPoint <= 0 && IsAlive)
                 {
                     KilledBy = player;
@@ -892,6 +862,11 @@ namespace WindowsFormsApp1
             }
         }
 
+        public override void OnHitPointChanged(HitPointChangedEventArgs e)
+        {
+            base.OnHitPointChanged(e);
+        }
+
         public int FistProprieter { get => fistProprieter; set => fistProprieter = value; }
         public int[] FingerGuessState { get => fingerGuessState; set => fingerGuessState = value; }
         public int[] FingerGuessWin { get => fingerGuessWin; set => fingerGuessWin = value; }
@@ -987,11 +962,13 @@ namespace WindowsFormsApp1
                     if (fingerGuessWin[order] == -1)
                     {
                         HitPoint -= 38;
+                        OnHitPointChanged(new HitPointChangedEventArgs(HitPoint, BattleField));
                     }
                     if (fingerGuessWin[order] == 1)
                     {
                         HitPoint = 510;
                         players[i].HitPoint = 0;
+                        players[i].OnHitPointChanged(new HitPointChangedEventArgs(players[i].HitPoint, BattleField));
                     }
                     isStatemate[order] = false;
                 }
@@ -1048,7 +1025,12 @@ namespace WindowsFormsApp1
             PlayerLabel.Text = $"{PlayerName} {CombatForceLevel.ToString()}";
         }
 
-        public void SpeedChange()
+        public override void OnHitPointChanged(HitPointChangedEventArgs e)
+        {
+            base.OnHitPointChanged(e);
+        }
+
+        public new void UpdateSpeed()
         {
             Random random = new Random(Guid.NewGuid().GetHashCode());
             SpeedOfX = 2 * random.Next(-10, 10);
@@ -1076,11 +1058,134 @@ namespace WindowsFormsApp1
         public void Radius(Player player)
         {
             double length = Math.Sqrt(Math.Pow(player.PlayerLabel.Left - PlayerLabel.Left, 2) + Math.Pow(player.PlayerLabel.Top - PlayerLabel.Top, 2));
-            player.HitPoint -= Convert.ToInt32(HitPoint / 200 * Math.Exp(-length / 50));
+            player.HitPoint -= Convert.ToInt32((double)HitPoint / 200 * Math.Exp(-length / 50));
+            player.OnHitPointChanged(new HitPointChangedEventArgs(player.HitPoint, BattleField));
 
             if (player.HitPoint <= 0 && player.IsAlive)
             {
                 player.KilledBy = this;
+            }
+        }
+    }
+
+    // Represents the surface on which the shapes are drawn
+    // Subscribes to shape events so that it knows
+    // when to redraw a shape.
+    public class PlayerGroup
+    {
+        public PlayerGroup()
+        {
+            PlayerList = new List<Player>();
+        }
+
+        public List<Player> PlayerList { get; set; }
+        public int Count { get => PlayerList.Count; }
+        public void AddPlayer(Player player)
+        {
+            PlayerList.Add(player);
+            // Subscribe to the base class event.
+            player.HitPointChanged += UpdateLabel;
+            player.HitPointChanged += HandleHitPointChanged;
+            player.LocationChanged += HandleLocationChanged;
+        }
+
+        // ...Other methods to draw, resize, etc.
+        private void UpdateLabel(object sender, HitPointChangedEventArgs e)
+        {
+            Player player = (Player)sender;
+            player.PlayerLabel.Text = $"{player.PlayerName} {player.CombatForceLevel.ToString()} {e.HitPoint.ToString()}";
+        }
+
+        private void HandleHitPointChanged(object sender, HitPointChangedEventArgs e)
+        {
+            Player player = (Player)sender;
+            if (e.HitPoint > 510)
+            {
+                player.PlayerLabel.BackColor = Color.FromArgb(0, 255, 0);
+            }
+            else if (e.HitPoint > 255)
+            {
+                player.PlayerLabel.BackColor = Color.FromArgb(510 - (int)e.HitPoint, 255, 0);
+            }
+            else if (e.HitPoint > 0)
+            {
+                player.PlayerLabel.BackColor = Color.FromArgb(255, (int)e.HitPoint, 0);
+            }
+            else
+            {
+                e.Battlefield.Controls.Remove(player.PlayerLabel);
+            }
+        }
+
+        private void HandleLocationChanged(object sender, LocationChangedEventArgs e)
+        {
+            Player player = (Player)sender;
+            player.Polygon.Move(e.DisplacementX, e.DisplacementY);
+        }
+
+        public void UpdateBattleForceLevel(ComboBox combatForceOptions)
+        {
+            Random random = new Random(Guid.NewGuid().GetHashCode());
+
+            switch (combatForceOptions.SelectedIndex)//'战力相同随机
+            {
+                case 0:
+                    foreach (var p in PlayerList)
+                    {
+                        if (!p.IsPlayer)
+                        {
+                            continue;
+                        }
+                        p.CombatForceLevel = random.Next(1, 6);
+                        p.CombatForceLevel *= random.Next(5) == 0 ? 2 : 1;
+                    }
+                    break;
+
+                case 1:
+                    int quarter = Player.PlayerNumber / 4;
+                    double[] combatForceLevelCache = new double[quarter];
+                    foreach (var p in PlayerList)
+                    {
+                        if (!p.IsPlayer)
+                        {
+                            continue;
+                        }
+                        if (p.CreatingOrder < quarter)
+                        {
+                            combatForceLevelCache[p.CreatingOrder] = PlayerList[p.CreatingOrder].CombatForceLevel;
+                            p.CombatForceLevel = PlayerList[p.CreatingOrder + quarter].CombatForceLevel;
+                        }
+                        else if (p.CreatingOrder < Player.PlayerNumber - quarter)
+                        {
+                            p.CombatForceLevel = PlayerList[p.CreatingOrder + quarter].CombatForceLevel;
+                        }
+                        else
+                        {
+                            p.CombatForceLevel = combatForceLevelCache[quarter - combatForceLevelCache.Length + p.CreatingOrder];
+                        }
+                    }
+                    break;
+
+                case 2:
+                    foreach (var p in PlayerList)
+                    {
+                        if (!p.IsPlayer)
+                        {
+                            continue;
+                        }
+                        double temp1 = random.NextDouble();
+                        double temp2 = random.NextDouble();
+                        p.CombatForceLevel = random.Next(1, 6);
+                        if (p.CombatForceLevel == 1 && temp1 > p.CreatingOrder / Player.PlayerNumber)
+                        {
+                            p.CombatForceLevel = (temp2 < 1 / (5 + 5 * p.CreatingOrder / (Player.PlayerNumber - 1))) ? 12 : 6;
+                        }
+                        else
+                        {
+                            p.CombatForceLevel *= (temp2 < 1 / (5 + 5 * p.CreatingOrder / (Player.PlayerNumber - 1))) ? 2 : 1;
+                        }
+                    }
+                    break;
             }
         }
     }

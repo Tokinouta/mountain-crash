@@ -43,7 +43,6 @@
             this.ClinicNumber = new System.Windows.Forms.TextBox();
             this.RiverNumber = new System.Windows.Forms.TextBox();
             this.MountainNumber = new System.Windows.Forms.TextBox();
-            this.BattleField = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.label1 = new System.Windows.Forms.Label();
             this.start = new System.Windows.Forms.Button();
@@ -54,6 +53,7 @@
             this.timer = new System.Windows.Forms.Timer(this.components);
             this.timerForBattle = new System.Windows.Forms.Timer(this.components);
             this.UpdateSpeed = new System.Windows.Forms.Timer(this.components);
+            this.BattleField = new System.Windows.Forms.GroupBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -204,18 +204,6 @@
             this.MountainNumber.TabIndex = 0;
             this.MountainNumber.Click += new System.EventHandler(this.Textbox_Click);
             // 
-            // BattleField
-            // 
-            this.BattleField.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.BattleField.Location = new System.Drawing.Point(12, 356);
-            this.BattleField.Name = "BattleField";
-            this.BattleField.Size = new System.Drawing.Size(121, 41);
-            this.BattleField.TabIndex = 0;
-            this.BattleField.TabStop = false;
-            this.BattleField.Text = "BattleField";
-            this.BattleField.Visible = false;
-            this.BattleField.Paint += new System.Windows.Forms.PaintEventHandler(this.BattleField_Paint);
-            // 
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.label1);
@@ -298,6 +286,20 @@
             // 
             this.UpdateSpeed.Interval = 10000;
             this.UpdateSpeed.Tick += new System.EventHandler(this.UpdateSpeed_Tick);
+            // 
+            // BattleField
+            // 
+            this.BattleField.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.BattleField.BackgroundImage = global::WindowsFormsApp1.Properties.Resources.Screenshot_2019_10_16_at_11_50_12_1024x613;
+            this.BattleField.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.BattleField.Location = new System.Drawing.Point(12, 349);
+            this.BattleField.Name = "BattleField";
+            this.BattleField.Size = new System.Drawing.Size(111, 48);
+            this.BattleField.TabIndex = 0;
+            this.BattleField.TabStop = false;
+            this.BattleField.Text = "BattleField";
+            this.BattleField.Visible = false;
+            this.BattleField.Paint += new System.Windows.Forms.PaintEventHandler(this.BattleField_Paint);
             // 
             // Form1
             // 
