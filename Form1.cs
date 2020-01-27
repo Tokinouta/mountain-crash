@@ -43,7 +43,7 @@ namespace WindowsFormsApp1
         {
             // horisontal: form width = max object width - 18
             // vertical: form height = max object height - 48
-            textBox1.Text = 3.ToString();
+            //textBox1.Text = 3.ToString();
             //MountainNumber.Text = 1.ToString();
             //RiverNumber.Text = 1.ToString();
             //ClinicNumber.Text = 10.ToString();
@@ -53,8 +53,8 @@ namespace WindowsFormsApp1
             //elfExists.Checked = true;
             //hatExists.Checked = true;
             //ozoneExists.Checked = true;
-            combatForceOptions.SelectedIndex = 2;
-            killOptions.SelectedIndex = 2;
+            //combatForceOptions.SelectedIndex = 0;
+            //killOptions.SelectedIndex = 0;
 
             label1.Text = "";
             if (killOptions.SelectedIndex < 0)
@@ -71,79 +71,71 @@ namespace WindowsFormsApp1
 
             BattleField.Top = groupBox1.Top;
             BattleField.Left = groupBox1.Left;
-            BattleField.Width = this.Width - groupBox1.Left - 10 - 10;
-            BattleField.Height = this.Height - groupBox1.Top - 35 - 10;
+            BattleField.Width = Width - groupBox1.Left - 10 - 10;
+            BattleField.Height = Height - groupBox1.Top - 35 - 10;
             groupBox1.Visible = false;
             groupBox2.Visible = false;
             BattleField.Visible = true;
 
-            int Temp;
-            if (!int.TryParse(textBox1.Text, out Temp) || Temp == 0)
+            #region player initialization
+            players = new List<Player>();
+            StreamReader PlayerName = new StreamReader(@"./PlayerName.txt");
+            int order = 0;
+            string nameTemp = "";
+            while (!PlayerName.EndOfStream)
             {
-                textBox1.Text = "Invalid input";
-                MountainNumber.SelectAll();
-                MessageBox.Show("Invalid player number");
-                BattleField.Refresh();
-                BattleField.Controls.Clear();
-                BattleField.Visible = false;
-                groupBox1.Visible = true;
-                groupBox2.Visible = true;
-                return;
+                nameTemp = PlayerName.ReadToEnd();
             }
-            else
+            string[] names = nameTemp.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            Player.PlayerNumber = names.Length;
+            Player.PlayerRemainedNumber = names.Length;
+            foreach (var name in names)
             {
-                Player.PlayerNumber = Temp;
-                Player.PlayerRemainedNumber = Temp;
+                var p = new Player(order, combatForceOptions.SelectedIndex, BattleField)
+                {
+                    PlayerName = name
+                };
+                p.PlayerLabel.Text = $"{p.PlayerName} {p.CombatForceLevel.ToString()}";
+                p.LocationChanged += new LocationChangedEventHandler(Moved);
+                players.Add(p);
+                ++order;
+            }
+            PlayerName.Close();
+            Player.CombatForceLevelCache = new double[Player.PlayerNumber / 4];
 
-                //players = new Player[Temp];
-                players = new List<Player>();
-                Player.CombatForceLevelCache = new double[Temp / 4];
-                StreamReader PlayerName = new StreamReader(@"./PlayerName.txt");
-                for (int i = 0; i < Temp; i++)
-                {
-                    var p = new Player(i, combatForceOptions.SelectedIndex, BattleField)
-                    {
-                        PlayerName = PlayerName.ReadLine()
-                    };
-                    p.PlayerLabel.Text = $"{p.PlayerName} {p.CombatForceLevel.ToString()}";
-                    p.LocationChanged += new LocationChangedEventHandler(Moved);
-                    players.Add(p);
-                }
-                PlayerName.Close();
-                players.Sort();
+            if (proprietorExists.Checked)
+            {
+                proprieter = new Proprieter(BattleField);
+                proprieter.LocationChanged += new LocationChangedEventHandler(Moved);
+                players.Add(proprieter);
+            }
+            if (eggExists.Checked)
+            {
+                egg = new Egg(BattleField);
+                egg.LocationChanged += new LocationChangedEventHandler(Moved);
+                players.Add(egg);
+            }
+            if (elfExists.Checked)
+            {
+                elf = new Elf(BattleField);
+                elf.LocationChanged += new LocationChangedEventHandler(Moved);
+                players.Add(elf);
+            }
+            if (hatExists.Checked)
+            {
+                hat = new Hat(combatForceOptions.SelectedIndex, BattleField);
+                hat.LocationChanged += new LocationChangedEventHandler(Moved);
+                players.Add(hat);
+            }
+            if (ozoneExists.Checked)
+            {
+                ozone = new Ozone(combatForceOptions.SelectedIndex, BattleField);
+                ozone.LocationChanged += new LocationChangedEventHandler(Moved);
+                players.Add(ozone);
+            }
+            #endregion
 
-                if (proprietorExists.Checked)
-                {
-                    proprieter = new Proprieter(BattleField);
-                    proprieter.LocationChanged += new LocationChangedEventHandler(Moved);
-                    players.Add(proprieter);
-                }
-                if (eggExists.Checked)
-                {
-                    egg = new Egg(BattleField);
-                    egg.LocationChanged += new LocationChangedEventHandler(Moved);
-                    players.Add(egg);
-                }
-                if (elfExists.Checked)
-                {
-                    elf = new Elf(BattleField);
-                    elf.LocationChanged += new LocationChangedEventHandler(Moved);
-                    players.Add(elf);
-                }
-                if (hatExists.Checked)
-                {
-                    hat = new Hat(combatForceOptions.SelectedIndex, BattleField);
-                    hat.LocationChanged += new LocationChangedEventHandler(Moved);
-                    players.Add(hat);
-                }
-                if (ozoneExists.Checked)
-                {
-                    ozone = new Ozone(combatForceOptions.SelectedIndex, BattleField);
-                    ozone.LocationChanged += new LocationChangedEventHandler(Moved);
-                    players.Add(ozone);
-                }
-            }// player number
-
+            int Temp;
             if (!int.TryParse(MountainNumber.Text, out Temp))
             {
                 MessageBox.Show("Invalid mountain number");
@@ -153,7 +145,6 @@ namespace WindowsFormsApp1
                 groupBox1.Visible = true;
                 groupBox2.Visible = true;
                 MountainNumber.Text = "Invalid input";
-                MountainNumber.SelectAll();
                 return;
             }
             else
@@ -176,7 +167,6 @@ namespace WindowsFormsApp1
                 groupBox1.Visible = true;
                 groupBox2.Visible = true;
                 RiverNumber.Text = "Invalid input";
-                MountainNumber.SelectAll();
                 return;
             }
             else
@@ -198,7 +188,6 @@ namespace WindowsFormsApp1
                 groupBox1.Visible = true;
                 groupBox2.Visible = true;
                 ClinicNumber.Text = "Invalid input";
-                MountainNumber.SelectAll();
                 return;
             }
             else
@@ -220,7 +209,6 @@ namespace WindowsFormsApp1
                 groupBox1.Visible = true;
                 groupBox2.Visible = true;
                 PitNumber.Text = "Invalid input";
-                MountainNumber.SelectAll();
                 return;
             }
             else
@@ -234,8 +222,8 @@ namespace WindowsFormsApp1
             }// Pit  
 
             isGenerated = true;
-            //playerRemained.Text = Player.PlayerRemainedNumber.ToString();
             playerRemained.Text = players.Count.ToString();
+            textBox1.Text = Player.PlayerNumber.ToString();
             generation.Enabled = false;
             start.Enabled = true;
             clear.Enabled = true;
@@ -260,7 +248,7 @@ namespace WindowsFormsApp1
             generation.Enabled = false;
             start.Enabled = false;
             pause.Enabled = true;
-            pause.Text = "Continue";
+            pause.Text = "Pause";
             clear.Enabled = true;
 
             TimeInSecond = 0;
@@ -281,39 +269,6 @@ namespace WindowsFormsApp1
             //Timer3.Enabled = True
             //Timer4.Enabled = True
             //Timer5.Enabled = True
-        }
-
-        private void Clear_Click(object sender, EventArgs e)
-        {
-            if (isStarted)
-            {
-                MessageBox.Show("Please do not clear", "Warning: Game running");
-                return;
-            }
-            BattleField.Refresh();
-            BattleField.Controls.Clear();
-            BattleField.Visible = false;
-
-            generation.Enabled = true;
-            start.Enabled = false;
-            pause.Enabled = false;
-            isGenerated = false;
-            
-            groupBox1.Visible = true;
-            groupBox2.Visible = true;
-            timer.Enabled = false;
-            timerForBattle.Enabled = false;
-            gamingTime.Text = "000:00";
-            if (hat != null)
-            {
-                hat.TimerCountDown.Enabled = false;
-            }
-            if (elf != null)
-            {
-                elf.TimerOfProtection.Enabled = false;
-                elf.TimerOfRecharge.Enabled = false;
-            }
-            label1.Text = "";
         }
 
         private void pause_Click(object sender, EventArgs e)
@@ -353,6 +308,39 @@ namespace WindowsFormsApp1
                 pause.Text = "Pause";
                 isStarted = true;
             }
+        }
+        
+        private void Clear_Click(object sender, EventArgs e)
+        {
+            if (isStarted)
+            {
+                MessageBox.Show("Please do not clear", "Warning: Game running");
+                return;
+            }
+            BattleField.Refresh();
+            BattleField.Controls.Clear();
+            BattleField.Visible = false;
+
+            generation.Enabled = true;
+            start.Enabled = false;
+            pause.Enabled = false;
+            isGenerated = false;
+            
+            groupBox1.Visible = true;
+            groupBox2.Visible = true;
+            timer.Enabled = false;
+            timerForBattle.Enabled = false;
+            gamingTime.Text = "000:00";
+            if (hat != null)
+            {
+                hat.TimerCountDown.Enabled = false;
+            }
+            if (elf != null)
+            {
+                elf.TimerOfProtection.Enabled = false;
+                elf.TimerOfRecharge.Enabled = false;
+            }
+            label1.Text = "";
         }
 
         private void timer1_Tick_1(object sender, EventArgs e)
@@ -439,7 +427,6 @@ namespace WindowsFormsApp1
                 }
             }
 
-
             foreach (var player1 in players)
             { 
                 foreach (var player2 in players)
@@ -512,6 +499,12 @@ namespace WindowsFormsApp1
             {
                 player.UpdateSpeed();
             }
+        }
+
+        private void Textbox_Click(object sender, EventArgs e)
+        {
+            TextBox box = (TextBox)sender;
+            box.SelectAll();
         }
 
         private void BattleField_Paint(object sender, PaintEventArgs e)

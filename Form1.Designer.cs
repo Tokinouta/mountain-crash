@@ -178,6 +178,7 @@
             this.PitNumber.Name = "PitNumber";
             this.PitNumber.Size = new System.Drawing.Size(103, 25);
             this.PitNumber.TabIndex = 3;
+            this.PitNumber.Click += new System.EventHandler(this.Textbox_Click);
             // 
             // ClinicNumber
             // 
@@ -185,6 +186,7 @@
             this.ClinicNumber.Name = "ClinicNumber";
             this.ClinicNumber.Size = new System.Drawing.Size(96, 25);
             this.ClinicNumber.TabIndex = 2;
+            this.ClinicNumber.Click += new System.EventHandler(this.Textbox_Click);
             // 
             // RiverNumber
             // 
@@ -192,6 +194,7 @@
             this.RiverNumber.Name = "RiverNumber";
             this.RiverNumber.Size = new System.Drawing.Size(104, 25);
             this.RiverNumber.TabIndex = 1;
+            this.RiverNumber.Click += new System.EventHandler(this.Textbox_Click);
             // 
             // MountainNumber
             // 
@@ -199,6 +202,7 @@
             this.MountainNumber.Name = "MountainNumber";
             this.MountainNumber.Size = new System.Drawing.Size(97, 25);
             this.MountainNumber.TabIndex = 0;
+            this.MountainNumber.Click += new System.EventHandler(this.Textbox_Click);
             // 
             // BattleField
             // 

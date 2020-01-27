@@ -122,7 +122,8 @@ namespace WindowsFormsApp1
                         Convert.ToInt32(5 * 10 / PlayerNumber * (PlayerNumber - (creatingOrder + 1))) / 10 + 1;
                     break;
                 case 2:
-                    double tempd = random.NextDouble(), temp1 = random.NextDouble();
+                    double tempd = random.NextDouble();
+                    double temp1 = random.NextDouble();
                     combatForceLevel = random.Next(1, 6);
                     if (tempd < 1 / (5 + 5 * (creatingOrder + 1) / (PlayerNumber - 1)))
                     {
@@ -171,12 +172,6 @@ namespace WindowsFormsApp1
             polygon = new Polygon(vectors);
         }
 
-        private void Times()
-        {
-            speedOfX *= 10;
-            speedOfY *= 10;
-        }
-
         public event LocationChangedEventHandler LocationChanged;
 
         #region Property
@@ -219,27 +214,32 @@ namespace WindowsFormsApp1
             double y = playerLabel.Top;
             playerLabel.Top += Convert.ToInt32(SpeedOfY);
             playerLabel.Left += Convert.ToInt32(SpeedOfX);
-            if (playerLabel.Top < 0)
-            {
-                speedOfY = -speedOfY;
-                playerLabel.Top = 1;
-            }
-            else if (playerLabel.Top > BattleField.Height - playerLabel.Height)
-            {
-                speedOfY = -speedOfY;
-                playerLabel.Top = BattleField.Height - playerLabel.Height - 1;
-            }
+            //if (playerLabel.Top < 0)
+            //{
+            //    speedOfY = -speedOfY;
+            //    playerLabel.Top = 1;
+            //}
+            //else if (playerLabel.Top > BattleField.Height - playerLabel.Height)
+            //{
+            //    speedOfY = -speedOfY;
+            //    playerLabel.Top = BattleField.Height - playerLabel.Height - 1;
+            //}
 
-            if (playerLabel.Left < 0)
-            {
-                speedOfX = -speedOfX;
-                playerLabel.Left = 1;
-            }
-            else if (playerLabel.Left > BattleField.Width - playerLabel.Width)
-            {
-                speedOfX = -speedOfX;
-                playerLabel.Left = BattleField.Width - playerLabel.Width - 1;
-            }
+            //if (playerLabel.Left < 0)
+            //{
+            //    speedOfX = -speedOfX;
+            //    playerLabel.Left = 1;
+            //}
+            //else if (playerLabel.Left > BattleField.Width - playerLabel.Width)
+            //{
+            //    speedOfX = -speedOfX;
+            //    playerLabel.Left = BattleField.Width - playerLabel.Width - 1;
+            //}
+            playerLabel.Top = playerLabel.Top < 0 ? BattleField.Height - playerLabel.Height :
+                (playerLabel.Top > BattleField.Height - playerLabel.Height ? 0 : playerLabel.Top);
+            playerLabel.Left = playerLabel.Left < 0 ? BattleField.Width - playerLabel.Width :
+                (playerLabel.Left > BattleField.Width - playerLabel.Width ? 0 : playerLabel.Left);
+
             LocationChangedEventArgs e = 
                 new LocationChangedEventArgs(playerLabel.Left - x, playerLabel.Top - y);
             LocationChanged(this, e);
@@ -253,52 +253,103 @@ namespace WindowsFormsApp1
             }
             if (polygon.IsCover(player.polygon))
             {
-                if (CombatForceLevel > player.CombatForceLevel)
+                switch (killOptions.SelectedIndex)
                 {
-                    switch (killOptions.SelectedIndex)
-                    {
-                        case 0:
-                            player.HitPoint -= 1;
-                            break;
-                        case 1:
+                    case 0:
+                        player.HitPoint -= 1;
+                        break;
+                    case 1:
+                        if (CombatForceLevel >= player.CombatForceLevel)
+                        {
                             player.HitPoint -= Convert.ToInt32(Math.Abs(CombatForceLevel - player.CombatForceLevel) / 2.5);
-                            break;
-                        case 2:
+                        }
+                        if (CombatForceLevel <= player.CombatForceLevel)
+                        {
+                            HitPoint -= Convert.ToInt32(Math.Abs(CombatForceLevel - player.CombatForceLevel) / 2.5);
+                        }
+                        break;
+                    case 2:
+                        if (CombatForceLevel > player.CombatForceLevel)
+                        {
                             player.HitPoint -= Convert.ToInt32(CombatForceLevel);
                             HitPoint -= Convert.ToInt32(player.CombatForceLevel);
-                            break;
-                        case 3:
+                        }
+                        else
+                        {
+                            player.HitPoint -= Convert.ToInt32(CombatForceLevel / 8);
+                            HitPoint -= Convert.ToInt32(player.CombatForceLevel / 8);
+                        }
+                        break;
+                    case 3:
+                        if (CombatForceLevel > player.CombatForceLevel)
+                        {
                             player.HitPoint -= Convert.ToInt32(Math.Abs(CombatForceLevel - player.CombatForceLevel) / 2.5);
                             if (player.HitPoint < 510 - Convert.ToInt32(Math.Abs(CombatForceLevel - player.CombatForceLevel) / 2.5))
                                 HitPoint += Convert.ToInt32(Math.Abs(CombatForceLevel - player.CombatForceLevel) / 2.5);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-                if (CombatForceLevel < player.CombatForceLevel)
-                {
-                    switch (killOptions.SelectedIndex)
-                    {
-                        case 0:
-                            HitPoint -= 1;
-                            break;
-                        case 1:
-                            player.HitPoint -= Convert.ToInt32(Math.Abs(player.CombatForceLevel - CombatForceLevel) / 2.5);
-                            break;
-                        case 2:
-                            player.HitPoint -= Convert.ToInt32(CombatForceLevel / 8);
-                            HitPoint -= Convert.ToInt32(player.CombatForceLevel / 8);
-                            break;
-                        case 3:
+                        }
+                        else if (CombatForceLevel < player.CombatForceLevel)
+                        {
                             HitPoint -= Convert.ToInt32(Math.Abs(player.CombatForceLevel - CombatForceLevel) / 2.5);
                             if (HitPoint < 510 - Convert.ToInt32(Math.Abs(player.CombatForceLevel - CombatForceLevel) / 2.5))
                                 player.HitPoint += Convert.ToInt32(Math.Abs(player.CombatForceLevel - CombatForceLevel) / 2.5);
-                            break;
-                        default:
-                            break;
-                    }
+                        }
+                        else
+                        {
+                            player.HitPoint -= Convert.ToInt32(Math.Abs(CombatForceLevel - player.CombatForceLevel) / 2.5);
+                            HitPoint -= Convert.ToInt32(Math.Abs(player.CombatForceLevel - CombatForceLevel) / 2.5);
+                        }
+                        break;
+                    default:
+                        break;
                 }
+
+                //if (CombatForceLevel > player.CombatForceLevel)
+                //{
+                //    switch (killOptions.SelectedIndex)
+                //    {
+                //        case 0:
+                //            player.HitPoint -= 1;
+                //            break;
+                //        case 1:
+                //            player.HitPoint -= Convert.ToInt32(Math.Abs(CombatForceLevel - player.CombatForceLevel) / 2.5);
+                //            break;
+                //        case 2:
+                //            player.HitPoint -= Convert.ToInt32(CombatForceLevel);
+                //            HitPoint -= Convert.ToInt32(player.CombatForceLevel);
+                //            break;
+                //        case 3:
+                //            player.HitPoint -= Convert.ToInt32(Math.Abs(CombatForceLevel - player.CombatForceLevel) / 2.5);
+                //            if (player.HitPoint < 510 - Convert.ToInt32(Math.Abs(CombatForceLevel - player.CombatForceLevel) / 2.5))
+                //                HitPoint += Convert.ToInt32(Math.Abs(CombatForceLevel - player.CombatForceLevel) / 2.5);
+                //            break;
+                //        default:
+                //            break;
+                //    }
+                //}
+                //if (CombatForceLevel < player.CombatForceLevel)
+                //{
+                //    switch (killOptions.SelectedIndex)
+                //    {
+                //        case 0:
+                //            HitPoint -= 1;
+                //            break;
+                //        case 1:
+                //            player.HitPoint -= Convert.ToInt32(Math.Abs(player.CombatForceLevel - CombatForceLevel) / 2.5);
+                //            break;
+                //        case 2:
+                //            player.HitPoint -= Convert.ToInt32(CombatForceLevel / 8);
+                //            HitPoint -= Convert.ToInt32(player.CombatForceLevel / 8);
+                //            break;
+                //        case 3:
+                //            HitPoint -= Convert.ToInt32(Math.Abs(player.CombatForceLevel - CombatForceLevel) / 2.5);
+                //            if (HitPoint < 510 - Convert.ToInt32(Math.Abs(player.CombatForceLevel - CombatForceLevel) / 2.5))
+                //                player.HitPoint += Convert.ToInt32(Math.Abs(player.CombatForceLevel - CombatForceLevel) / 2.5);
+                //            break;
+                //        default:
+                //            break;
+                //    }
+                //}
+
                 if (HitPoint <= 0 && IsAlive)
                 {
                     KilledBy = player;
@@ -319,7 +370,7 @@ namespace WindowsFormsApp1
                 SurvivalTime = survivalTime;
                 SurvivalRank = PlayerRemainedNumber;
                 killedBy.KillNumber++;
-                killedBy.AttackScore += Convert.ToInt32(300 * Math.Sqrt(1 / 300 * survivalTime));
+                killedBy.AttackScore += Convert.ToInt32(300 * Math.Sqrt((double)survivalTime / 300));
                 IsAlive = false;
                 if (playerRemainedNumber != 0 && IsPlayer)
                 {
@@ -412,9 +463,11 @@ namespace WindowsFormsApp1
             {
                 killedby = killedBy == null ? "none" : killedBy.PlayerName;
             }
-            return $"{PlayerName,-10}\t{survivalRank.ToString(),3}\t{creatingOrder.ToString(),3}\t{score.ToString(),3}\t" +
-                   $"{survivalTime.ToString(),3}\t{timeScore.ToString(),3}\t{attackScore.ToString(),3}\t" +
-                   $"{killNumber.ToString(),3}\t{bonus.ToString(),3}\t{killedby}\n";
+            timeScore = Convert.ToInt32(300 * Math.Sqrt(survivalTime / 300));
+            score = timeScore + attackScore + bonus;
+            return $"{survivalRank.ToString(),3}\t{score.ToString(),5}\t" +
+                   $"{survivalTime.ToString(),5}\t{timeScore.ToString(),5}\t{attackScore.ToString(),5}\t" +
+                   $"{killNumber.ToString(),5}\t{bonus.ToString(),5} {PlayerName} {killedby}\n";
         }
 
         #region Interaction
@@ -571,7 +624,7 @@ namespace WindowsFormsApp1
             PlayerName = "草帽大叔";
             PlayerLabel.Text = $"{PlayerName} {CombatForceLevel.ToString()}";
             PlayerLabel.BackColor = Color.Green;
-            timerCountDown = new System.Windows.Forms.Timer
+            timerCountDown = new Timer
             {
                 Interval = 1000,
                 Enabled = false
