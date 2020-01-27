@@ -28,6 +28,15 @@ namespace WindowsFormsApp1
         //sec为秒计时，mini为分计时
         int TimeInSecond, TimeInMinute;
         bool isGenerated = false, isStarted = false;
+        
+        void CleanUp()
+        {
+            BattleField.Refresh();
+            BattleField.Controls.Clear();
+            BattleField.Visible = false;
+            groupBox1.Visible = true;
+            groupBox2.Visible = true;
+        }
 
         public Form1()
         {
@@ -79,7 +88,23 @@ namespace WindowsFormsApp1
 
             #region player initialization
             players = new List<Player>();
-            StreamReader PlayerName = new StreamReader(@"./PlayerName.txt");
+            StreamReader PlayerName;
+            try
+            {
+                PlayerName = new StreamReader(@"./PlayerName.txt");
+            }
+            catch (FileNotFoundException)
+            {
+                MessageBox.Show(@"请确认PlayerName.txt和此程序在同一路径。", "未发现PlayerName.txt");
+                CleanUp();
+                return;
+            }
+            catch (DirectoryNotFoundException)
+            {
+                MessageBox.Show(@"指定的路径无效，例如位于未映射的驱动器上。");
+                CleanUp();
+                return;
+            }
             int order = 0;
             string nameTemp = "";
             while (!PlayerName.EndOfStream)
@@ -95,7 +120,7 @@ namespace WindowsFormsApp1
                 {
                     PlayerName = name
                 };
-                p.PlayerLabel.Text = $"{p.PlayerName} {p.CombatForceLevel.ToString()}";
+                p.PlayerLabel.Text = $"{ p.PlayerName} {p.CombatForceLevel.ToString()}";
                 p.LocationChanged += new LocationChangedEventHandler(Moved);
                 players.Add(p);
                 ++order;
@@ -139,11 +164,7 @@ namespace WindowsFormsApp1
             if (!int.TryParse(MountainNumber.Text, out Temp))
             {
                 MessageBox.Show("Invalid mountain number");
-                BattleField.Refresh();
-                BattleField.Controls.Clear();
-                BattleField.Visible = false;
-                groupBox1.Visible = true;
-                groupBox2.Visible = true;
+                CleanUp();
                 MountainNumber.Text = "Invalid input";
                 return;
             }
@@ -161,11 +182,7 @@ namespace WindowsFormsApp1
             if (!int.TryParse(RiverNumber.Text, out Temp))
             {
                 MessageBox.Show("Invalid river number");
-                BattleField.Refresh();
-                BattleField.Controls.Clear();
-                BattleField.Visible = false;
-                groupBox1.Visible = true;
-                groupBox2.Visible = true;
+                CleanUp();
                 RiverNumber.Text = "Invalid input";
                 return;
             }
@@ -182,11 +199,7 @@ namespace WindowsFormsApp1
             if (!int.TryParse(ClinicNumber.Text, out Temp))
             {
                 MessageBox.Show("Invalid clinic number");
-                BattleField.Refresh();
-                BattleField.Controls.Clear();
-                BattleField.Visible = false;
-                groupBox1.Visible = true;
-                groupBox2.Visible = true;
+                CleanUp();
                 ClinicNumber.Text = "Invalid input";
                 return;
             }
@@ -203,11 +216,7 @@ namespace WindowsFormsApp1
             if (!int.TryParse(PitNumber.Text, out Temp))
             {
                 MessageBox.Show("Invalid pit number");
-                BattleField.Refresh();
-                BattleField.Controls.Clear();
-                BattleField.Visible = false;
-                groupBox1.Visible = true;
-                groupBox2.Visible = true;
+                CleanUp();
                 PitNumber.Text = "Invalid input";
                 return;
             }
