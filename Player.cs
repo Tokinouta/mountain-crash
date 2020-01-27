@@ -42,6 +42,14 @@ namespace WindowsFormsApp1
             Battlefield = battlefield;
         }
     }
+    public class CombatForceLevelChangedEventArgs : EventArgs
+    {
+        public double ConbatForceLevel { get; set; }
+        public CombatForceLevelChangedEventArgs(double conbatForceLevel)
+        {
+            ConbatForceLevel = conbatForceLevel;
+        }
+    }
 
     public class Player : IComparable<Player>
     {
@@ -76,6 +84,7 @@ namespace WindowsFormsApp1
 
         public event EventHandler<LocationChangedEventArgs> LocationChanged;
         public event EventHandler<HitPointChangedEventArgs> HitPointChanged;
+        public event EventHandler<CombatForceLevelChangedEventArgs> CombatForceLevelChanged;
 
         //The event-invoking method that derived classes can override.
         public virtual void OnHitPointChanged(HitPointChangedEventArgs e)
@@ -97,7 +106,15 @@ namespace WindowsFormsApp1
                 handler(this, e);
             }
         }
-        
+        public void OnCombatForceLevelChanged(CombatForceLevelChangedEventArgs e)
+        {
+            EventHandler<CombatForceLevelChangedEventArgs> handler = CombatForceLevelChanged;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
+       
         public Player(GroupBox BattleField)
         {
             Random random = new Random(Guid.NewGuid().GetHashCode());
@@ -1087,6 +1104,7 @@ namespace WindowsFormsApp1
             player.HitPointChanged += UpdateLabel;
             player.HitPointChanged += HandleHitPointChanged;
             player.LocationChanged += HandleLocationChanged;
+            player.CombatForceLevelChanged += UpdateLabel;
         }
 
         // ...Other methods to draw, resize, etc.
@@ -1123,13 +1141,19 @@ namespace WindowsFormsApp1
             player.Polygon.Move(e.DisplacementX, e.DisplacementY);
         }
 
+        private void UpdateLabel(object sender, CombatForceLevelChangedEventArgs e)
+        {
+            Player player = (Player)sender;
+            player.PlayerLabel.Text = $"{player.PlayerName} {e.ConbatForceLevel.ToString()} {player.HitPoint.ToString()}";
+        }
+
         public void UpdateBattleForceLevel(ComboBox combatForceOptions)
         {
             Random random = new Random(Guid.NewGuid().GetHashCode());
 
-            switch (combatForceOptions.SelectedIndex)//'战力相同随机
+            switch (combatForceOptions.SelectedIndex)
             {
-                case 0:
+                case 0://'战力相同随机
                     foreach (var p in PlayerList)
                     {
                         if (!p.IsPlayer)
@@ -1161,7 +1185,7 @@ namespace WindowsFormsApp1
                         }
                         else
                         {
-                            p.CombatForceLevel = combatForceLevelCache[quarter - combatForceLevelCache.Length + p.CreatingOrder];
+                            p.CombatForceLevel = combatForceLevelCache[quarter - Player.PlayerNumber + p.CreatingOrder];
                         }
                     }
                     break;

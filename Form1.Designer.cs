@@ -284,7 +284,7 @@
             // 
             // UpdateSpeed
             // 
-            this.UpdateSpeed.Interval = 10000;
+            this.UpdateSpeed.Interval = 5000;
             this.UpdateSpeed.Tick += new System.EventHandler(this.UpdateSpeed_Tick);
             // 
             // BattleField

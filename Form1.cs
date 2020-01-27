@@ -62,7 +62,7 @@ namespace WindowsFormsApp1
             //elfExists.Checked = true;
             //hatExists.Checked = true;
             //ozoneExists.Checked = true;
-            //combatForceOptions.SelectedIndex = 0;
+            //combatForceOptions.SelectedIndex = 1;
             //killOptions.SelectedIndex = 2;
 
             label1.Text = "";
@@ -126,7 +126,7 @@ namespace WindowsFormsApp1
                 {
                     PlayerName = name
                 };
-                p.PlayerLabel.Text = $"{ p.PlayerName} {p.CombatForceLevel.ToString()}";
+                p.PlayerLabel.Text = $"{p.PlayerName} {p.CombatForceLevel.ToString()}";
                 players.AddPlayer(p);
                 ++order;
             }
@@ -270,6 +270,7 @@ namespace WindowsFormsApp1
 
             isStarted = true;
             timerForBattle.Enabled = true;
+            UpdateSpeed.Enabled = true;
             //Timer3.Enabled = True
             //Timer4.Enabled = True
             //Timer5.Enabled = True
@@ -281,6 +282,7 @@ namespace WindowsFormsApp1
             {
                 timer.Enabled = false;
                 timerForBattle.Enabled = false;
+                UpdateSpeed.Enabled = false;
                 //Timer3.Enabled = False
                 //Timer5.Enabled = False
                 if (hat != null)
@@ -301,6 +303,7 @@ namespace WindowsFormsApp1
                 //Timer3.Enabled = True
                 timer.Enabled = true;
                 timerForBattle.Enabled = true;
+                UpdateSpeed.Enabled = true;
                 if (hat != null)
                 {
                     hat.TimerCountDown.Enabled = true;
@@ -334,6 +337,7 @@ namespace WindowsFormsApp1
             groupBox2.Visible = true;
             timer.Enabled = false;
             timerForBattle.Enabled = false;
+            UpdateSpeed.Enabled = true;
             gamingTime.Text = "000:00";
             if (hat != null)
             {
