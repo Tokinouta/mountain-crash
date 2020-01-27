@@ -420,7 +420,7 @@ namespace WindowsFormsApp1
             playerLabel.Text = $"{playerName} {combatForceLevel.ToString()} {hitPoint.ToString()}";
         }
 
-        public string ShowInfo()
+        public string[] ShowInfo()
         {
             string killedby;
             if (IsPlayer)
@@ -433,9 +433,17 @@ namespace WindowsFormsApp1
             }
             timeScore = Convert.ToInt32(300 * Math.Sqrt(survivalTime / 300));
             score = timeScore + attackScore + bonus;
-            return $"{survivalRank.ToString(),3}\t{score.ToString(),5}\t" +
-                   $"{survivalTime.ToString(),5}\t{timeScore.ToString(),5}\t{attackScore.ToString(),5}\t" +
-                   $"{killNumber.ToString(),5}\t{bonus.ToString(),5} {PlayerName} {killedby}\n";
+            return new string[] { 
+                $"{PlayerName}", 
+                $"{survivalRank.ToString(),3}",
+                $"{score.ToString(),5}", 
+                $"{survivalTime.ToString(),5}", 
+                $"{timeScore.ToString(),5}", 
+                $"{attackScore.ToString(),5}",
+                $"{killNumber.ToString(),5}",
+                $"{bonus.ToString(),5}",
+                $"{killedby}" 
+            };
         }
 
         #region Interaction

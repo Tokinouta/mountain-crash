@@ -43,8 +43,6 @@
             this.ClinicNumber = new System.Windows.Forms.TextBox();
             this.RiverNumber = new System.Windows.Forms.TextBox();
             this.MountainNumber = new System.Windows.Forms.TextBox();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.label1 = new System.Windows.Forms.Label();
             this.start = new System.Windows.Forms.Button();
             this.pause = new System.Windows.Forms.Button();
             this.clear = new System.Windows.Forms.Button();
@@ -54,8 +52,18 @@
             this.timerForBattle = new System.Windows.Forms.Timer(this.components);
             this.UpdateSpeed = new System.Windows.Forms.Timer(this.components);
             this.BattleField = new System.Windows.Forms.GroupBox();
+            this.Result = new System.Windows.Forms.DataGridView();
+            this.玩家名称 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column8 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column7 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column6 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column9 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.groupBox1.SuspendLayout();
-            this.groupBox2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.Result)).BeginInit();
             this.SuspendLayout();
             // 
             // generation
@@ -90,10 +98,10 @@
             this.groupBox1.Controls.Add(this.MountainNumber);
             this.groupBox1.Location = new System.Drawing.Point(140, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(303, 403);
+            this.groupBox1.Size = new System.Drawing.Size(303, 464);
             this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "groupBox1";
+            this.groupBox1.Text = "Configurations";
             // 
             // combatForceOptions
             // 
@@ -204,24 +212,6 @@
             this.MountainNumber.TabIndex = 0;
             this.MountainNumber.Click += new System.EventHandler(this.Textbox_Click);
             // 
-            // groupBox2
-            // 
-            this.groupBox2.Controls.Add(this.label1);
-            this.groupBox2.Location = new System.Drawing.Point(449, 12);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(499, 402);
-            this.groupBox2.TabIndex = 3;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "groupBox2";
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(7, 25);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(0, 15);
-            this.label1.TabIndex = 0;
-            // 
             // start
             // 
             this.start.Enabled = false;
@@ -301,11 +291,113 @@
             this.BattleField.Visible = false;
             this.BattleField.Paint += new System.Windows.Forms.PaintEventHandler(this.BattleField_Paint);
             // 
+            // Result
+            // 
+            this.Result.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.Result.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.玩家名称,
+            this.Column8,
+            this.Column3,
+            this.Column2,
+            this.Column4,
+            this.Column5,
+            this.Column7,
+            this.Column6,
+            this.Column9});
+            this.Result.Location = new System.Drawing.Point(449, 12);
+            this.Result.Name = "Result";
+            this.Result.RowHeadersWidth = 5;
+            this.Result.RowTemplate.Height = 20;
+            this.Result.Size = new System.Drawing.Size(499, 464);
+            this.Result.TabIndex = 9;
+            // 
+            // 玩家名称
+            // 
+            this.玩家名称.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.玩家名称.HeaderText = "玩家名称";
+            this.玩家名称.MinimumWidth = 6;
+            this.玩家名称.Name = "玩家名称";
+            this.玩家名称.ReadOnly = true;
+            this.玩家名称.Width = 96;
+            // 
+            // Column8
+            // 
+            this.Column8.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
+            this.Column8.HeaderText = "幸存排名";
+            this.Column8.MinimumWidth = 6;
+            this.Column8.Name = "Column8";
+            this.Column8.ReadOnly = true;
+            this.Column8.Width = 96;
+            // 
+            // Column3
+            // 
+            this.Column3.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
+            this.Column3.HeaderText = "幸存时间";
+            this.Column3.MinimumWidth = 6;
+            this.Column3.Name = "Column3";
+            this.Column3.ReadOnly = true;
+            this.Column3.Width = 96;
+            // 
+            // Column2
+            // 
+            this.Column2.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
+            this.Column2.HeaderText = "玩家得分";
+            this.Column2.MinimumWidth = 6;
+            this.Column2.Name = "Column2";
+            this.Column2.ReadOnly = true;
+            this.Column2.Width = 96;
+            // 
+            // Column4
+            // 
+            this.Column4.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
+            this.Column4.HeaderText = "时间得分";
+            this.Column4.MinimumWidth = 6;
+            this.Column4.Name = "Column4";
+            this.Column4.ReadOnly = true;
+            this.Column4.Width = 96;
+            // 
+            // Column5
+            // 
+            this.Column5.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
+            this.Column5.HeaderText = "交战得分";
+            this.Column5.MinimumWidth = 6;
+            this.Column5.Name = "Column5";
+            this.Column5.ReadOnly = true;
+            this.Column5.Width = 96;
+            // 
+            // Column7
+            // 
+            this.Column7.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
+            this.Column7.HeaderText = "加分";
+            this.Column7.MinimumWidth = 6;
+            this.Column7.Name = "Column7";
+            this.Column7.ReadOnly = true;
+            this.Column7.Width = 66;
+            // 
+            // Column6
+            // 
+            this.Column6.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
+            this.Column6.HeaderText = "殉职人数";
+            this.Column6.MinimumWidth = 6;
+            this.Column6.Name = "Column6";
+            this.Column6.ReadOnly = true;
+            this.Column6.Width = 96;
+            // 
+            // Column9
+            // 
+            this.Column9.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.Column9.HeaderText = "被殉职";
+            this.Column9.MinimumWidth = 6;
+            this.Column9.Name = "Column9";
+            this.Column9.ReadOnly = true;
+            this.Column9.Width = 81;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(960, 488);
+            this.Controls.Add(this.Result);
             this.Controls.Add(this.gamingTime);
             this.Controls.Add(this.playerRemained);
             this.Controls.Add(this.clear);
@@ -315,14 +407,12 @@
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.generation);
-            this.Controls.Add(this.groupBox2);
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
-            this.groupBox2.ResumeLayout(false);
-            this.groupBox2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.Result)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -336,7 +426,6 @@
         private System.Windows.Forms.Button clear;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.GroupBox BattleField;
         private System.Windows.Forms.TextBox PitNumber;
         private System.Windows.Forms.TextBox ClinicNumber;
@@ -353,8 +442,17 @@
         private System.Windows.Forms.ComboBox killOptions;
         private System.Windows.Forms.Timer timer;
         private System.Windows.Forms.Timer timerForBattle;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Timer UpdateSpeed;
+        private System.Windows.Forms.DataGridView Result;
+        private System.Windows.Forms.DataGridViewTextBoxColumn 玩家名称;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column8;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column3;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column4;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column5;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column7;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column6;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column9;
     }
 }
 

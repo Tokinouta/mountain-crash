@@ -35,7 +35,9 @@ namespace WindowsFormsApp1
             BattleField.Controls.Clear();
             BattleField.Visible = false;
             groupBox1.Visible = true;
-            groupBox2.Visible = true;
+            //groupBox2.Visible = true;
+            Result.Visible = true;
+            Result.Rows.Clear();
         }
 
         public Form1()
@@ -43,29 +45,25 @@ namespace WindowsFormsApp1
             InitializeComponent();
         }
 
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
-        }
+        private void Form1_Load(object sender, EventArgs e) { }
 
         private void Generation_Click(object sender, EventArgs e)
         {
             // horisontal: form width = max object width - 18
             // vertical: form height = max object height - 48
             // textBox1.Text = 3.ToString();
-            //MountainNumber.Text = 1.ToString();
-            //RiverNumber.Text = 1.ToString();
-            //ClinicNumber.Text = 10.ToString();
-            //PitNumber.Text = 10.ToString();
-            //proprietorExists.Checked = true;
-            //eggExists.Checked = true;
-            //elfExists.Checked = true;
-            //hatExists.Checked = true;
-            //ozoneExists.Checked = true;
-            //combatForceOptions.SelectedIndex = 1;
-            //killOptions.SelectedIndex = 2;
+            MountainNumber.Text = 1.ToString();
+            RiverNumber.Text = 1.ToString();
+            ClinicNumber.Text = 10.ToString();
+            PitNumber.Text = 10.ToString();
+            proprietorExists.Checked = true;
+            eggExists.Checked = true;
+            elfExists.Checked = true;
+            hatExists.Checked = true;
+            ozoneExists.Checked = true;
+            combatForceOptions.SelectedIndex = 1;
+            killOptions.SelectedIndex = 2;
 
-            label1.Text = "";
             if (killOptions.SelectedIndex < 0)
             {
                 MessageBox.Show("Please choose kill options", "Warning: No choice of kill options");
@@ -83,8 +81,11 @@ namespace WindowsFormsApp1
             BattleField.Width = Width - groupBox1.Left - 10 - 10;
             BattleField.Height = Height - groupBox1.Top - 35 - 10;
             groupBox1.Visible = false;
-            groupBox2.Visible = false;
+            //groupBox2.Visible = false;
+            Result.Visible = false;
             BattleField.Visible = true;
+            Result.Visible = false;
+            Result.Rows.Clear();
 
             #region player initialization
             players = new PlayerGroup();
@@ -334,7 +335,8 @@ namespace WindowsFormsApp1
             isGenerated = false;
             
             groupBox1.Visible = true;
-            groupBox2.Visible = true;
+            //groupBox2.Visible = true;
+            Result.Visible = true;
             timer.Enabled = false;
             timerForBattle.Enabled = false;
             UpdateSpeed.Enabled = true;
@@ -348,7 +350,6 @@ namespace WindowsFormsApp1
                 elf.TimerOfProtection.Enabled = false;
                 elf.TimerOfRecharge.Enabled = false;
             }
-            label1.Text = "";
         }
 
         private void timer1_Tick_1(object sender, EventArgs e)
@@ -482,7 +483,9 @@ namespace WindowsFormsApp1
                 BattleField.Controls.Clear();
                 BattleField.Visible = false;
                 groupBox1.Visible = true;
-                groupBox2.Visible = true;
+                //groupBox2.Visible = true;
+                Result.Visible = true;
+                Result.Rows.Clear();
                 timer.Enabled = false;
 
                 players.PlayerList.Sort();
@@ -490,7 +493,7 @@ namespace WindowsFormsApp1
                 players.PlayerList[0].SurvivalRank = 1;
                 foreach (var player in players.PlayerList)
                 {
-                    label1.Text += player.ShowInfo();
+                    Result.Rows.Add(player.ShowInfo());
                 }
 
                 timerForBattle.Enabled = false;
