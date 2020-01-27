@@ -284,14 +284,16 @@ namespace WindowsFormsApp1
                         if (CombatForceLevel > player.CombatForceLevel)
                         {
                             player.HitPoint -= Convert.ToInt32(Math.Abs(CombatForceLevel - player.CombatForceLevel) / 2.5);
-                            if (player.HitPoint < 510 - Convert.ToInt32(Math.Abs(CombatForceLevel - player.CombatForceLevel) / 2.5))
-                                HitPoint += Convert.ToInt32(Math.Abs(CombatForceLevel - player.CombatForceLevel) / 2.5);
+                            //if (player.HitPoint < 510 - Convert.ToInt32(Math.Abs(CombatForceLevel - player.CombatForceLevel) / 2.5))
+                            HitPoint += Convert.ToInt32(Math.Abs(CombatForceLevel - player.CombatForceLevel) / 2.5);
+                            HitPoint = HitPoint > 510 ? 510 : HitPoint;
                         }
                         else if (CombatForceLevel < player.CombatForceLevel)
                         {
                             HitPoint -= Convert.ToInt32(Math.Abs(player.CombatForceLevel - CombatForceLevel) / 2.5);
-                            if (HitPoint < 510 - Convert.ToInt32(Math.Abs(player.CombatForceLevel - CombatForceLevel) / 2.5))
-                                player.HitPoint += Convert.ToInt32(Math.Abs(player.CombatForceLevel - CombatForceLevel) / 2.5);
+                            //if (HitPoint < 510 - Convert.ToInt32(Math.Abs(player.CombatForceLevel - CombatForceLevel) / 2.5))
+                            player.HitPoint += Convert.ToInt32(Math.Abs(player.CombatForceLevel - CombatForceLevel) / 2.5);
+                            HitPoint = HitPoint > 510 ? 510 : HitPoint;
                         }
                         else
                         {
@@ -381,11 +383,15 @@ namespace WindowsFormsApp1
 
         public void UpdateColor(GroupBox BattleField)
         {
-            if (HitPoint > 255)
+            if (HitPoint > 510)
+            {
+                PlayerLabel.BackColor = Color.FromArgb(255, 255, 0);
+            }
+            else if (HitPoint > 255)
             {
                 PlayerLabel.BackColor = Color.FromArgb(510 - HitPoint, 255, 0);
             }
-            else if (HitPoint <= 255 && HitPoint > 0)
+            else if (HitPoint > 0)
             {
                 PlayerLabel.BackColor = Color.FromArgb(255, HitPoint, 0);
             }

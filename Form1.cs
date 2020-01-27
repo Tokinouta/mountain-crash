@@ -52,18 +52,18 @@ namespace WindowsFormsApp1
         {
             // horisontal: form width = max object width - 18
             // vertical: form height = max object height - 48
-            //textBox1.Text = 3.ToString();
-            //MountainNumber.Text = 1.ToString();
-            //RiverNumber.Text = 1.ToString();
-            //ClinicNumber.Text = 10.ToString();
-            //PitNumber.Text = 10.ToString();
-            //proprietorExists.Checked = true;
-            //eggExists.Checked = true;
-            //elfExists.Checked = true;
-            //hatExists.Checked = true;
-            //ozoneExists.Checked = true;
-            //combatForceOptions.SelectedIndex = 0;
-            //killOptions.SelectedIndex = 0;
+            textBox1.Text = 3.ToString();
+            MountainNumber.Text = 1.ToString();
+            RiverNumber.Text = 1.ToString();
+            ClinicNumber.Text = 10.ToString();
+            PitNumber.Text = 10.ToString();
+            proprietorExists.Checked = true;
+            eggExists.Checked = true;
+            elfExists.Checked = true;
+            hatExists.Checked = true;
+            ozoneExists.Checked = true;
+            combatForceOptions.SelectedIndex = 2;
+            killOptions.SelectedIndex = 3;
 
             label1.Text = "";
             if (killOptions.SelectedIndex < 0)
