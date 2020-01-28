@@ -63,8 +63,11 @@
             this.Column9 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Number = new System.Windows.Forms.Label();
             this.RandomGeneration = new System.Windows.Forms.Button();
+            this.TeamNumber = new System.Windows.Forms.NumericUpDown();
+            this.TeamNumberPrompt = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Result)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.TeamNumber)).BeginInit();
             this.SuspendLayout();
             // 
             // generation
@@ -81,6 +84,8 @@
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+            this.groupBox1.Controls.Add(this.TeamNumberPrompt);
+            this.groupBox1.Controls.Add(this.TeamNumber);
             this.groupBox1.Controls.Add(this.combatForceOptions);
             this.groupBox1.Controls.Add(this.killOptions);
             this.groupBox1.Controls.Add(this.ozoneExists);
@@ -274,7 +279,7 @@
             // 
             // UpdateSpeed
             // 
-            this.UpdateSpeed.Interval = 5000;
+            this.UpdateSpeed.Interval = 15000;
             this.UpdateSpeed.Tick += new System.EventHandler(this.UpdateSpeed_Tick);
             // 
             // BattleField
@@ -418,6 +423,28 @@
             this.RandomGeneration.UseVisualStyleBackColor = true;
             this.RandomGeneration.Click += new System.EventHandler(this.RandomGeneration_Click);
             // 
+            // TeamNumber
+            // 
+            this.TeamNumber.Location = new System.Drawing.Point(31, 294);
+            this.TeamNumber.Maximum = new decimal(new int[] {
+            3,
+            0,
+            0,
+            0});
+            this.TeamNumber.Name = "TeamNumber";
+            this.TeamNumber.Size = new System.Drawing.Size(191, 25);
+            this.TeamNumber.TabIndex = 12;
+            // 
+            // TeamNumberPrompt
+            // 
+            this.TeamNumberPrompt.AutoSize = true;
+            this.TeamNumberPrompt.Location = new System.Drawing.Point(31, 267);
+            this.TeamNumberPrompt.Name = "TeamNumberPrompt";
+            this.TeamNumberPrompt.Size = new System.Drawing.Size(187, 15);
+            this.TeamNumberPrompt.TabIndex = 13;
+            this.TeamNumberPrompt.Text = "战队数量（点击进入帮助）";
+            this.TeamNumberPrompt.Click += new System.EventHandler(this.TeamNumberPrompt_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
@@ -440,6 +467,7 @@
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Result)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.TeamNumber)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -481,6 +509,8 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Column9;
         private System.Windows.Forms.Label Number;
         private System.Windows.Forms.Button RandomGeneration;
+        private System.Windows.Forms.Label TeamNumberPrompt;
+        private System.Windows.Forms.NumericUpDown TeamNumber;
     }
 }
 

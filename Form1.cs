@@ -117,11 +117,11 @@ namespace WindowsFormsApp1
             Player.PlayerRemainedNumber = names.Length;
             foreach (var name in names)
             {
-                var p = new Player(order, combatForceOptions.SelectedIndex, BattleField)
+                var p = new Player(order, combatForceOptions.SelectedIndex, BattleField, (int)TeamNumber.Value)
                 {
                     PlayerName = name
                 };
-                p.PlayerLabel.Text = $"{p.PlayerName} {p.CombatForceLevel.ToString()}";
+                p.PlayerLabel.Text = $"{p.Team.ToString()} {p.PlayerName} {p.CombatForceLevel.ToString()}";
                 players.AddPlayer(p);
                 ++order;
             }
@@ -169,8 +169,8 @@ namespace WindowsFormsApp1
                 double switchL = 5 * (Math.Atan(-Temp / 10) / 2 + Math.PI / 4);
                 for (int i = 0; i < Temp; i++)
                 {
-                    int rand= random.Next(5);
-                    mountains[i] = new Mountain(2, switchL, BattleField);
+                    int rand = random.Next(5);
+                    mountains[i] = new Mountain(rand, switchL, BattleField);
                 }
             }// Mountain
             if (!int.TryParse(RiverNumber.Text, out Temp))
@@ -441,7 +441,7 @@ namespace WindowsFormsApp1
                     {
                         if (player1 != player2 && player2 != proprieter && player2.IsAlive && player1.IsAlive)
                         {
-                            player1.Battle(player2, killOptions);
+                            player1.Battle(player2, killOptions, TeamNumber);
                             player1.Settle(TimeInSecond);
                             player2.Settle(TimeInSecond);
                         }
@@ -535,6 +535,19 @@ namespace WindowsFormsApp1
 
             combatForceOptions.SelectedIndex = random.Next(3);
             killOptions.SelectedIndex = random.Next(4);
+            TeamNumber.Value = random.Next(4);
+        }
+
+        private void TeamNumberPrompt_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show(
+                "0：无队伍配置\n" +
+                "1：齐心协力打NPC\n" +
+                "2：2个队\n" +
+                "3：3个队\n" +
+                "NPC不参加队伍分配\n"+
+                "玩家按PlayerName.txt里的顺序分队，从前到后，数够人数即成队",
+                "选项说明");
         }
 
         private void BattleField_Paint(object sender, PaintEventArgs e)

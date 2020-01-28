@@ -64,6 +64,7 @@ namespace WindowsFormsApp1
         public int HitPoint { get; set; }
         public double CombatForceLevel { get; set; }
         public bool IsAlive { get; set; }
+        public int Team { get; set; }
 
         public int CreatingOrder { get; set; }
         public int Score { get; set; }
@@ -153,14 +154,14 @@ namespace WindowsFormsApp1
                                               new Vector(PlayerLabel.Right, PlayerLabel.Bottom),
                                               new Vector(PlayerLabel.Right, PlayerLabel.Top) };
             Polygon = new Polygon(vectors);
-            OnHitPointChanged(new HitPointChangedEventArgs(HitPoint, BattleField));
+            Team = -1;
         }
-        public Player(int creatingOrder, int combatForceOption, GroupBox BattleField)
+        public Player(int creatingOrder, int combatForceOption, GroupBox BattleField, int teamNumber)
         {
             Random random = new Random(Guid.NewGuid().GetHashCode());
             SpeedOfX = random.Next(-10, 10);
             SpeedOfY = random.Next(-10, 10);
-            this.CreatingOrder = creatingOrder;
+            CreatingOrder = creatingOrder;
             HitPoint = 510;
             IsAlive = true;
             switch (combatForceOption)
@@ -225,10 +226,15 @@ namespace WindowsFormsApp1
                                               new Vector(PlayerLabel.Right, PlayerLabel.Bottom),
                                               new Vector(PlayerLabel.Right, PlayerLabel.Top) };
             Polygon = new Polygon(vectors);
-            OnHitPointChanged(new HitPointChangedEventArgs(HitPoint, BattleField));
+            if (teamNumber == 0)
+            {
+                Team = creatingOrder;
+            }
+            else
+            {
+                Team = (teamNumber > 1 ? teamNumber : 1) * creatingOrder / PlayerNumber;
+            }
         }
-
-
 
         public void Move(GroupBox BattleField)
         {
@@ -265,11 +271,28 @@ namespace WindowsFormsApp1
             OnLocationChanged(new LocationChangedEventArgs(PlayerLabel.Left - x, PlayerLabel.Top - y));
         }
 
-        public void Battle(Player player, ComboBox killOptions)
+        public void Battle(Player player, ComboBox killOptions, NumericUpDown teamNumber)
         {
             if (!player.IsAlive)
             {
                 return;
+            }
+            switch (teamNumber.Value)
+            {
+                case 0:
+                    break;
+                case 1:
+                    if (IsPlayer && player.IsPlayer)
+                    {
+                        return;
+                    }
+                    break;
+                default:
+                    if (IsPlayer && player.IsPlayer && Team == player.Team)
+                    {
+                        return;
+                    }
+                    break;
             }
             if (Polygon.IsCover(player.Polygon))
             {
@@ -538,7 +561,7 @@ namespace WindowsFormsApp1
             base.OnHitPointChanged(e);
         }
 
-        public Hat(int combatForceOption, GroupBox BattleField) : base(0, combatForceOption, BattleField)
+        public Hat(int combatForceOption, GroupBox BattleField) : base(0, combatForceOption, BattleField, 0)
         {
             CountDown = 60;
             PlayerKilledHat = null;
@@ -563,6 +586,7 @@ namespace WindowsFormsApp1
                 Enabled = false
             };
             TimerCountDown.Tick += new EventHandler(TimerCountDown_Tick);
+            Team = -1;
         }
 
 
@@ -956,13 +980,7 @@ namespace WindowsFormsApp1
 
     public class Ozone : Player
     {
-        public Ozone(GroupBox BattleField) : base(BattleField)
-        {
-            PlayerLabel.BackColor = Color.Green;
-            PlayerName = "臭氧加速器";
-            PlayerLabel.Text = $"{PlayerName} {CombatForceLevel.ToString()}";
-        }
-        public Ozone(int combatForceOption, GroupBox BattleField) : base(0, combatForceOption, BattleField)
+        public Ozone(int combatForceOption, GroupBox BattleField) : base(0, combatForceOption, BattleField, 0)
         {
             Random random = new Random(Guid.NewGuid().GetHashCode());
             switch (combatForceOption)
@@ -980,6 +998,7 @@ namespace WindowsFormsApp1
             PlayerLabel.BackColor = Color.Green;
             PlayerName = "臭氧加速器";
             PlayerLabel.Text = $"{PlayerName} {CombatForceLevel.ToString()}";
+            Team = -1;
         }
 
         public override void OnHitPointChanged(HitPointChangedEventArgs e)
@@ -1051,7 +1070,7 @@ namespace WindowsFormsApp1
         private void UpdateLabel(object sender, HitPointChangedEventArgs e)
         {
             Player player = (Player)sender;
-            player.PlayerLabel.Text = $"{player.PlayerName} {player.CombatForceLevel.ToString()} {e.HitPoint.ToString()}";
+            player.PlayerLabel.Text = $"{player.Team.ToString()} {player.PlayerName} {player.CombatForceLevel.ToString()} {e.HitPoint.ToString()}";
         }
 
         private void HandleHitPointChanged(object sender, HitPointChangedEventArgs e)
@@ -1084,7 +1103,7 @@ namespace WindowsFormsApp1
         private void UpdateLabel(object sender, CombatForceLevelChangedEventArgs e)
         {
             Player player = (Player)sender;
-            player.PlayerLabel.Text = $"{player.PlayerName} {e.ConbatForceLevel.ToString()} {player.HitPoint.ToString()}";
+            player.PlayerLabel.Text = $"{player.Team.ToString()} {player.PlayerName} {e.ConbatForceLevel.ToString()} {player.HitPoint.ToString()}";
         }
 
         private void Settle(object sender, HitPointChangedEventArgs e)

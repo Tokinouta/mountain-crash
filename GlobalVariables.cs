@@ -71,7 +71,7 @@ namespace WindowsFormsApp1
                 {
                     // 产生水平物体
                     case 0:
-                        controlL = random.Next(Convert.ToInt32(200 * switchL) + 1) + Convert.ToInt32(200 * switchL);
+                        controlL = random.Next(Convert.ToInt32(80 * switchL) + 1) + Convert.ToInt32(20 * switchL);
                         endPoint.Y = StartPoint.Y;
                         endPoint.X = StartPoint.X + controlL;
                         flag = EndPoint.X > BattleField.Right;
@@ -79,7 +79,7 @@ namespace WindowsFormsApp1
 
                     // 产生竖直物体
                     case 1:
-                        controlL = random.Next(Convert.ToInt32(200 * switchL) + 1) + Convert.ToInt32(200 * switchL);
+                        controlL = random.Next(Convert.ToInt32(80 * switchL) + 1) + Convert.ToInt32(20 * switchL);
                         endPoint.X = StartPoint.X;
                         endPoint.Y = StartPoint.Y + controlL;
                         flag = EndPoint.Y > BattleField.Bottom;
