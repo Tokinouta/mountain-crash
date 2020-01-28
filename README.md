@@ -1,7 +1,7 @@
 # mountain-crash
 撞山游戏（WinForm+C#重制版）
 
-## ChangeLog
+## Change Log
 * 2020.1.28
   * Player类使用自动属性
   * 增加随机生成功能，随机产生设置
