@@ -52,17 +52,17 @@ namespace WindowsFormsApp1
             // horisontal: form width = max object width - 18
             // vertical: form height = max object height - 48
             // textBox1.Text = 3.ToString();
-            MountainNumber.Text = 1.ToString();
-            RiverNumber.Text = 1.ToString();
-            ClinicNumber.Text = 10.ToString();
-            PitNumber.Text = 10.ToString();
-            proprietorExists.Checked = true;
-            eggExists.Checked = true;
-            elfExists.Checked = true;
-            hatExists.Checked = true;
-            ozoneExists.Checked = true;
-            combatForceOptions.SelectedIndex = 1;
-            killOptions.SelectedIndex = 2;
+            //MountainNumber.Text = 1.ToString();
+            //RiverNumber.Text = 1.ToString();
+            //ClinicNumber.Text = 10.ToString();
+            //PitNumber.Text = 10.ToString();
+            //proprietorExists.Checked = true;
+            //eggExists.Checked = true;
+            //elfExists.Checked = true;
+            //hatExists.Checked = true;
+            //ozoneExists.Checked = true;
+            //combatForceOptions.SelectedIndex = 1;
+            //killOptions.SelectedIndex = 2;
 
             if (killOptions.SelectedIndex < 0)
             {
@@ -97,12 +97,6 @@ namespace WindowsFormsApp1
             catch (FileNotFoundException)
             {
                 MessageBox.Show(@"请确认PlayerName.txt和此程序在同一路径。", "未发现PlayerName.txt");
-                CleanUp();
-                return;
-            }
-            catch (DirectoryNotFoundException)
-            {
-                MessageBox.Show(@"指定的路径无效，例如位于未映射的驱动器上。");
                 CleanUp();
                 return;
             }
@@ -165,7 +159,7 @@ namespace WindowsFormsApp1
             {
                 MessageBox.Show("Invalid mountain number");
                 CleanUp();
-                MountainNumber.Text = "Invalid input";
+                MountainNumber.Text = "山的数量";
                 return;
             }
             else
@@ -183,7 +177,7 @@ namespace WindowsFormsApp1
             {
                 MessageBox.Show("Invalid river number");
                 CleanUp();
-                RiverNumber.Text = "Invalid input";
+                RiverNumber.Text = "河的数量";
                 return;
             }
             else
@@ -200,7 +194,7 @@ namespace WindowsFormsApp1
             {
                 MessageBox.Show("Invalid clinic number");
                 CleanUp();
-                ClinicNumber.Text = "Invalid input";
+                ClinicNumber.Text = "医疗站数量";
                 return;
             }
             else
@@ -217,7 +211,7 @@ namespace WindowsFormsApp1
             {
                 MessageBox.Show("Invalid pit number");
                 CleanUp();
-                PitNumber.Text = "Invalid input";
+                PitNumber.Text = "坑的数量";
                 return;
             }
             else
@@ -232,7 +226,7 @@ namespace WindowsFormsApp1
 
             isGenerated = true;
             playerRemained.Text = players.Count.ToString();
-            textBox1.Text = Player.PlayerNumber.ToString();
+            Number.Text = Player.PlayerNumber.ToString();
             generation.Enabled = false;
             start.Enabled = true;
             clear.Enabled = true;
@@ -340,6 +334,7 @@ namespace WindowsFormsApp1
             timer.Enabled = false;
             timerForBattle.Enabled = false;
             UpdateSpeed.Enabled = true;
+            TimeInSecond = 0;
             gamingTime.Text = "000:00";
             if (hat != null)
             {
@@ -361,7 +356,6 @@ namespace WindowsFormsApp1
                     continue;
                 }
                 player.Move(BattleField);
-                player.UpdateLabel();
             }
 
             foreach (var player1 in players.PlayerList)
@@ -487,6 +481,8 @@ namespace WindowsFormsApp1
                 Result.Visible = true;
                 Result.Rows.Clear();
                 timer.Enabled = false;
+                TimeInSecond = 0;
+                gamingTime.Text = "000:00";
 
                 players.PlayerList.Sort();
                 players.PlayerList[0].SurvivalTime = TimeInSecond;
@@ -513,6 +509,32 @@ namespace WindowsFormsApp1
         {
             TextBox box = (TextBox)sender;
             box.SelectAll();
+        }
+
+        private void BattleField_SizeChanged(object sender, EventArgs e)
+        {
+            if (!isGenerated)
+            {
+                return;
+            }
+        }
+
+        private void RandomGeneration_Click(object sender, EventArgs e)
+        {
+            Random random = new Random(Guid.NewGuid().GetHashCode());
+            proprietorExists.Checked = random.NextDouble() < 0.5;
+            eggExists.Checked = random.NextDouble() < 0.5; 
+            elfExists.Checked = random.NextDouble() < 0.5; 
+            hatExists.Checked = random.NextDouble() < 0.5; 
+            ozoneExists.Checked = random.NextDouble() < 0.5;
+
+            MountainNumber.Text = random.Next(1, 10).ToString();
+            RiverNumber.Text = random.Next(1, 10).ToString();
+            ClinicNumber.Text = random.Next(1, 20).ToString();
+            PitNumber.Text = random.Next(1, 20).ToString();
+
+            combatForceOptions.SelectedIndex = random.Next(3);
+            killOptions.SelectedIndex = random.Next(4);
         }
 
         private void BattleField_Paint(object sender, PaintEventArgs e)

@@ -30,7 +30,6 @@
         {
             this.components = new System.ComponentModel.Container();
             this.generation = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.combatForceOptions = new System.Windows.Forms.ComboBox();
             this.killOptions = new System.Windows.Forms.ComboBox();
@@ -62,13 +61,15 @@
             this.Column7 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column6 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column9 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Number = new System.Windows.Forms.Label();
+            this.RandomGeneration = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Result)).BeginInit();
             this.SuspendLayout();
             // 
             // generation
             // 
-            this.generation.Location = new System.Drawing.Point(30, 43);
+            this.generation.Location = new System.Drawing.Point(30, 54);
             this.generation.Name = "generation";
             this.generation.Size = new System.Drawing.Size(104, 34);
             this.generation.TabIndex = 0;
@@ -76,15 +77,10 @@
             this.generation.UseVisualStyleBackColor = true;
             this.generation.Click += new System.EventHandler(this.Generation_Click);
             // 
-            // textBox1
-            // 
-            this.textBox1.Location = new System.Drawing.Point(30, 12);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(104, 25);
-            this.textBox1.TabIndex = 1;
-            // 
             // groupBox1
             // 
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.groupBox1.Controls.Add(this.combatForceOptions);
             this.groupBox1.Controls.Add(this.killOptions);
             this.groupBox1.Controls.Add(this.ozoneExists);
@@ -186,6 +182,7 @@
             this.PitNumber.Name = "PitNumber";
             this.PitNumber.Size = new System.Drawing.Size(103, 25);
             this.PitNumber.TabIndex = 3;
+            this.PitNumber.Text = "坑的数量";
             this.PitNumber.Click += new System.EventHandler(this.Textbox_Click);
             // 
             // ClinicNumber
@@ -194,6 +191,7 @@
             this.ClinicNumber.Name = "ClinicNumber";
             this.ClinicNumber.Size = new System.Drawing.Size(96, 25);
             this.ClinicNumber.TabIndex = 2;
+            this.ClinicNumber.Text = "医疗站数量";
             this.ClinicNumber.Click += new System.EventHandler(this.Textbox_Click);
             // 
             // RiverNumber
@@ -202,6 +200,7 @@
             this.RiverNumber.Name = "RiverNumber";
             this.RiverNumber.Size = new System.Drawing.Size(104, 25);
             this.RiverNumber.TabIndex = 1;
+            this.RiverNumber.Text = "河的数量";
             this.RiverNumber.Click += new System.EventHandler(this.Textbox_Click);
             // 
             // MountainNumber
@@ -210,12 +209,13 @@
             this.MountainNumber.Name = "MountainNumber";
             this.MountainNumber.Size = new System.Drawing.Size(97, 25);
             this.MountainNumber.TabIndex = 0;
+            this.MountainNumber.Text = "山的数量";
             this.MountainNumber.Click += new System.EventHandler(this.Textbox_Click);
             // 
             // start
             // 
             this.start.Enabled = false;
-            this.start.Location = new System.Drawing.Point(30, 83);
+            this.start.Location = new System.Drawing.Point(30, 94);
             this.start.Name = "start";
             this.start.Size = new System.Drawing.Size(103, 33);
             this.start.TabIndex = 4;
@@ -226,7 +226,7 @@
             // pause
             // 
             this.pause.Enabled = false;
-            this.pause.Location = new System.Drawing.Point(30, 122);
+            this.pause.Location = new System.Drawing.Point(30, 133);
             this.pause.Name = "pause";
             this.pause.Size = new System.Drawing.Size(103, 33);
             this.pause.TabIndex = 5;
@@ -237,7 +237,7 @@
             // clear
             // 
             this.clear.Enabled = false;
-            this.clear.Location = new System.Drawing.Point(30, 161);
+            this.clear.Location = new System.Drawing.Point(30, 172);
             this.clear.Name = "clear";
             this.clear.Size = new System.Drawing.Size(103, 33);
             this.clear.TabIndex = 6;
@@ -248,11 +248,11 @@
             // playerRemained
             // 
             this.playerRemained.AutoSize = true;
-            this.playerRemained.Location = new System.Drawing.Point(12, 249);
+            this.playerRemained.Location = new System.Drawing.Point(27, 240);
             this.playerRemained.Name = "playerRemained";
-            this.playerRemained.Size = new System.Drawing.Size(127, 15);
+            this.playerRemained.Size = new System.Drawing.Size(97, 15);
             this.playerRemained.TabIndex = 7;
-            this.playerRemained.Text = "Player Remained";
+            this.playerRemained.Text = "剩余玩家数量";
             // 
             // gamingTime
             // 
@@ -279,6 +279,9 @@
             // 
             // BattleField
             // 
+            this.BattleField.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.BattleField.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.BattleField.BackgroundImage = global::WindowsFormsApp1.Properties.Resources.Screenshot_2019_10_16_at_11_50_12_1024x613;
             this.BattleField.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
@@ -289,10 +292,14 @@
             this.BattleField.TabStop = false;
             this.BattleField.Text = "BattleField";
             this.BattleField.Visible = false;
+            this.BattleField.SizeChanged += new System.EventHandler(this.BattleField_SizeChanged);
             this.BattleField.Paint += new System.Windows.Forms.PaintEventHandler(this.BattleField_Paint);
             // 
             // Result
             // 
+            this.Result.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.Result.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.Result.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.玩家名称,
@@ -392,11 +399,32 @@
             this.Column9.ReadOnly = true;
             this.Column9.Width = 81;
             // 
+            // Number
+            // 
+            this.Number.AutoSize = true;
+            this.Number.Location = new System.Drawing.Point(27, 220);
+            this.Number.Name = "Number";
+            this.Number.Size = new System.Drawing.Size(67, 15);
+            this.Number.TabIndex = 10;
+            this.Number.Text = "玩家数量";
+            // 
+            // RandomGeneration
+            // 
+            this.RandomGeneration.Location = new System.Drawing.Point(30, 14);
+            this.RandomGeneration.Name = "RandomGeneration";
+            this.RandomGeneration.Size = new System.Drawing.Size(103, 34);
+            this.RandomGeneration.TabIndex = 11;
+            this.RandomGeneration.Text = "Randomize!";
+            this.RandomGeneration.UseVisualStyleBackColor = true;
+            this.RandomGeneration.Click += new System.EventHandler(this.RandomGeneration_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(960, 488);
+            this.Controls.Add(this.RandomGeneration);
+            this.Controls.Add(this.Number);
             this.Controls.Add(this.Result);
             this.Controls.Add(this.gamingTime);
             this.Controls.Add(this.playerRemained);
@@ -405,7 +433,6 @@
             this.Controls.Add(this.start);
             this.Controls.Add(this.BattleField);
             this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.textBox1);
             this.Controls.Add(this.generation);
             this.Name = "Form1";
             this.Text = "Form1";
@@ -424,7 +451,6 @@
         private System.Windows.Forms.Button start;
         private System.Windows.Forms.Button pause;
         private System.Windows.Forms.Button clear;
-        private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox BattleField;
         private System.Windows.Forms.TextBox PitNumber;
@@ -453,6 +479,8 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Column7;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column6;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column9;
+        private System.Windows.Forms.Label Number;
+        private System.Windows.Forms.Button RandomGeneration;
     }
 }
 
