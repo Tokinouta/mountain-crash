@@ -40,6 +40,40 @@ namespace WindowsFormsApp1
             Result.Rows.Clear();
         }
 
+        void FinishUp()
+        {
+            if (hat != null)
+            {
+                hat.TimerCountDown.Enabled = false;
+            }
+            if (elf != null)
+            {
+                elf.TimerOfProtection.Enabled = false;
+                elf.TimerOfRecharge.Enabled = false;
+            }
+            if (egg != null)
+            {
+                egg.GettingIntoEarth.Enabled = false;
+            }
+
+            generation.Enabled = true;
+            start.Enabled = false;
+            pause.Enabled = false;
+            isGenerated = false;
+            isStarted = false;
+
+            BattleField.Refresh();
+            BattleField.Controls.Clear();
+            BattleField.Visible = false;
+            groupBox1.Visible = true;
+            //groupBox2.Visible = true;
+            Result.Visible = true;
+            timer.Enabled = false;
+            TimeInSecond = 0;
+            gamingTime.Text = "000:00";
+            timerForBattle.Enabled = false;
+        }
+
         public Form1()
         {
             InitializeComponent();
@@ -227,6 +261,7 @@ namespace WindowsFormsApp1
             isGenerated = true;
             playerRemained.Text = players.Count.ToString();
             Number.Text = Player.PlayerNumber.ToString();
+            RandomGeneration.Enabled = false;
             generation.Enabled = false;
             start.Enabled = true;
             clear.Enabled = true;
@@ -450,49 +485,102 @@ namespace WindowsFormsApp1
             }
 
             playerRemained.Text = Player.PlayerRemainedNumber.ToString();
-            if (Player.PlayerRemainedNumber <= 1 && isStarted)
+            switch (TeamNumber.Value)
             {
-                if (hat != null)
-                {
-                    hat.TimerCountDown.Enabled = false;
-                }
-                if (elf != null)
-                {
-                    elf.TimerOfProtection.Enabled = false;
-                    elf.TimerOfRecharge.Enabled = false;
-                }
-                if (egg != null)
-                {
-                    egg.GettingIntoEarth.Enabled = false;
-                }
-
-
-                generation.Enabled = true;
-                start.Enabled = false;
-                pause.Enabled = false;
-                isGenerated = false;
-                isStarted = false;
-
-                BattleField.Refresh();
-                BattleField.Controls.Clear();
-                BattleField.Visible = false;
-                groupBox1.Visible = true;
-                //groupBox2.Visible = true;
-                Result.Visible = true;
-                Result.Rows.Clear();
-                timer.Enabled = false;
-                TimeInSecond = 0;
-                gamingTime.Text = "000:00";
-
-                players.PlayerList.Sort();
-                players.PlayerList[0].SurvivalTime = TimeInSecond;
-                players.PlayerList[0].SurvivalRank = 1;
-                foreach (var player in players.PlayerList)
-                {
-                    Result.Rows.Add(player.ShowInfo());
-                }
-
-                timerForBattle.Enabled = false;
+                case 0:
+                    if (Player.PlayerRemainedNumber <= 1 && isStarted)
+                    {
+                        Result.Rows.Clear();
+                        players.PlayerList.Sort();
+                        players.PlayerList[0].SurvivalTime = TimeInSecond;
+                        players.PlayerList[0].SurvivalRank = 1;
+                        foreach (var player in players.PlayerList)
+                        {
+                            Result.Rows.Add(player.ShowInfo());
+                        }
+                        FinishUp();
+                    }
+                    break;
+                case 1:
+                    bool isFinish = isStarted &&
+                        ((proprieter == null) || (proprieter != null && !proprieter.IsAlive)) &&
+                        ((egg == null) || (egg != null && !egg.IsAlive)) &&
+                        ((elf == null) || (elf != null && !elf.IsAlive)) &&
+                        ((hat == null) || (hat != null && !hat.IsAlive)) &&
+                        ((ozone == null) || (ozone != null && !ozone.IsAlive));
+                    if (isFinish)
+                    {
+                        Result.Rows.Clear();
+                        players.PlayerList.Sort();
+                        foreach (var player in players.PlayerList)
+                        {
+                            if (player.IsAlive)
+                            {
+                                player.SurvivalTime = TimeInSecond;
+                                player.SurvivalRank = 1;
+                            }
+                            Result.Rows.Add(player.ShowInfo());
+                        }
+                        FinishUp();
+                    }
+                    break;
+                default:
+                    int teamWin;
+                    var teamTemp =
+                        from p in players.PlayerList
+                        where p.IsAlive && p.IsPlayer
+                        select p.Team;
+                    Dictionary<int, int> dic = new Dictionary<int, int>();
+                    if (teamTemp.Count() > 0)
+                    {
+                        foreach (var val in teamTemp)
+                        {
+                            //若字典中不存在该元素，则将该元素加入字典中
+                            if (!dic.ContainsKey(val))
+                            {
+                                dic.Add(val, 1);
+                            }
+                            else    //若字典中存在该元素，则统计该元素在数组中出现的次数
+                            {
+                                dic[val] += 1;
+                            }
+                        }
+                        if (dic.Count == 1)
+                        {
+                            //foreach (var key in dic.Keys)
+                            //{
+                            //    teamWin = dic[key];
+                            //    break;
+                            //}
+                            Result.Rows.Clear();
+                            players.PlayerList.Sort();
+                            foreach (var player in players.PlayerList)
+                            {
+                                if (player.IsAlive)
+                                {
+                                    player.SurvivalTime = TimeInSecond;
+                                    player.SurvivalRank = 1;
+                                }
+                                Result.Rows.Add(player.ShowInfo());
+                            }
+                            FinishUp();
+                        }
+                    }
+                    else
+                    {
+                        Result.Rows.Clear();
+                        foreach (var player in players.PlayerList)
+                        {
+                            if (player.IsAlive)
+                            {
+                                player.SurvivalTime = TimeInSecond;
+                                player.SurvivalRank = 1;
+                            }
+                            Result.Rows.Add(player.ShowInfo());
+                        }
+                        FinishUp();
+                    }
+                    break;
             }
         }
 

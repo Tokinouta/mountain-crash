@@ -145,7 +145,8 @@ namespace WindowsFormsApp1
                 Width = 100,
                 Top = random.Next(BattleField.Height - 10),
                 Left = random.Next(BattleField.Width - 100),
-                BackColor = Color.Aquamarine
+                BackColor = Color.Aquamarine,
+                AutoSize = true
             };
             this.BattleField = BattleField;
             BattleField.Controls.Add(PlayerLabel);
@@ -217,7 +218,8 @@ namespace WindowsFormsApp1
                 Width = 100,
                 Top = random.Next(BattleField.Height - 10),
                 Left = random.Next(BattleField.Width - 100),
-                BackColor = Color.Aquamarine
+                BackColor = Color.Aquamarine,
+                AutoSize = true
             };
             this.BattleField = BattleField;
             BattleField.Controls.Add(PlayerLabel);
@@ -327,14 +329,12 @@ namespace WindowsFormsApp1
                         if (CombatForceLevel > player.CombatForceLevel)
                         {
                             player.HitPoint -= Convert.ToInt32(Math.Abs(CombatForceLevel - player.CombatForceLevel) / 2.5);
-                            //if (player.HitPoint < 510 - Convert.ToInt32(Math.Abs(CombatForceLevel - player.CombatForceLevel) / 2.5))
                             HitPoint += Convert.ToInt32(Math.Abs(CombatForceLevel - player.CombatForceLevel) / 2.5);
                             HitPoint = HitPoint > 510 ? 510 : HitPoint;
                         }
                         else if (CombatForceLevel < player.CombatForceLevel)
                         {
                             HitPoint -= Convert.ToInt32(Math.Abs(player.CombatForceLevel - CombatForceLevel) / 2.5);
-                            //if (HitPoint < 510 - Convert.ToInt32(Math.Abs(player.CombatForceLevel - CombatForceLevel) / 2.5))
                             player.HitPoint += Convert.ToInt32(Math.Abs(player.CombatForceLevel - CombatForceLevel) / 2.5);
                             HitPoint = HitPoint > 510 ? 510 : HitPoint;
                         }
@@ -361,7 +361,6 @@ namespace WindowsFormsApp1
                 }
             }
         }
-
 
         //'结算幸存时间、殉职排名、殉职人数、交战得分、被殉职
         public void Settle(int survivalTime)
@@ -421,7 +420,7 @@ namespace WindowsFormsApp1
             TimeScore = Convert.ToInt32(300 * Math.Sqrt(SurvivalTime / 300));
             Score = TimeScore + AttackScore + Bonus;
             return new string[] { 
-                $"{PlayerName}", 
+                $"{Team.ToString()} {PlayerName}", 
                 $"{SurvivalRank.ToString()}",
                 $"{SurvivalTime.ToString()}", 
                 $"{Score.ToString()}", 
