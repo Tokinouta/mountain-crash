@@ -1,6 +1,8 @@
 #pragma once
 #include <fmt/core.h>
 
+#include <QTimer>
+#include <optional>
 #include <random>
 #include <string>
 #include <typeinfo>
@@ -31,7 +33,7 @@ struct Player {
   static int PlayerRemainedNumber;
 
   std::string name{""};
-  std::string killed_by{""};
+  Player* killed_by{nullptr};
 
   // 运动学参数
   // 这里的x和y以窗口左上角为原点，向右为x，向下为y
@@ -79,3 +81,25 @@ struct Player {
   // 玩家信息，返回一个字符串数组
   std::vector<std::string> info();
 };
+
+struct Hat : Player {
+  int count_down;
+  std::unique_ptr<QTimer> count_down_timer;
+
+  Hat(int field_x, int field_y, int combat_force_option);
+  void timer_count_down_tick();
+  void settle(Player& player, int survival_time) override;
+};
+
+struct Egg : Player {};
+
+struct Elf : Player {
+  int period_of_recharge;
+  Player* player_protected_by_elf;
+  std::unique_ptr<QTimer> timer_of_protection;
+  std::unique_ptr<QTimer> timer_of_recharge;
+  Elf(int field_x, int field_y, int combat_force_option);
+};
+struct Proprieter : Player {};
+
+struct Ozone : Player {};

@@ -137,7 +137,7 @@ void Player::settle(Player& player, int survival_time) {
   if (hit_point <= 0 && is_alive) {
     survival_time = survival_time;
     survival_rank = PlayerRemainedNumber;
-    killed_by = player.name;
+    killed_by = &player;
     kill_number++;
     player.attack_score +=
         static_cast<int>(300 * sqrt((double)survival_time / 300));
@@ -162,4 +162,107 @@ std::vector<std::string> Player::info() {
                                   fmt::format("{}", bonus),
                                   fmt::format("{}", kill_number),
                                   killed_by};
+}
+
+Hat::Hat(int field_x, int field_y, int combat_force_option)
+    : Player(field_x, field_y, combat_force_option, 0),
+      count_down_timer(std::make_unique<QTimer>(new QTimer())),
+      count_down(10) {
+  count_down_timer->setInterval(1000);
+  count_down_timer->callOnTimeout([this]() {
+    this->count_down--;
+    if (this->count_down > 0 && this->killed_by != nullptr) {
+      this->killed_by->combat_force_level = 12;
+      this->killed_by->hit_point = 510;
+      // on hit point changed;
+    } else {
+      this->count_down_timer->stop();
+      this->count_down = 60;
+      this->killed_by = nullptr;
+    }
+  });
+  switch (combat_force_option) {
+    case 0:
+    case 1:
+      combat_force_level = 5;
+      break;
+    case 2:
+      combat_force_level = 5.5;
+      break;
+    default:
+      break;
+  }
+  name = "²ÝÃ±´óÊå";
+}
+
+void Hat::timer_count_down_tick() {
+  count_down -= 1;
+  // determine whether player_killed_hat is null
+  if (count_down > 0 && killed_by != nullptr) {
+    killed_by->combat_force_level = 12;
+    killed_by->hit_point = 510;
+    // on_hit_point_changed(new HitPointChangedEventArgs(
+    //     player_killed_hat.hit_point, battle_field));
+  } else {
+    // timer_count_down.Enabled = false;
+    count_down = 60;
+    killed_by = nullptr;
+  }
+}
+
+void Hat::settle(Player& player, int survival_time) {
+  if (hit_point <= 0 && is_alive) {
+    survival_time = survival_time;
+    killed_by->bonus += 500;
+    is_alive = false;
+    killed_by->hit_point = 510;
+    killed_by->combat_force_level = 12;
+    killed_by = killed_by;
+    // timer_count_down.Enabled = true;
+  }
+}
+
+Elf::Elf(int field_x, int field_y, int combat_force_option)
+    : Player(field_x, field_y, combat_force_option, 0),
+      period_of_recharge(60 * 1000),
+      player_protected_by_elf(nullptr),
+      timer_of_protection(std::make_unique<QTimer>(new QTimer())),
+      timer_of_recharge(std::make_unique<QTimer>(new QTimer())) {
+  combat_force_level = 3.5;
+  name = "¾«Áé";
+  timer_of_protection->setInterval(period_of_recharge);
+  timer_of_protection->callOnTimeout([this]() {
+    this->period_of_recharge--;
+    if (this->period_of_recharge == 0) {
+      std::srand(std::time(nullptr));
+      timer_of_protection->stop();
+      period_of_recharge = 60;
+      // player_label->setVisible(true);
+      auto old_x = this->x;
+      auto old_y = this->y;
+      this->x = 0;
+      this->y = std::rand();
+      // on_location_changed(new LocationChangedEventArgs(
+      //     player_label->left() - x, player_label->top() - y));
+      this->hit_point = 510;
+      this->vx = std::rand() % 20 - 10;
+      this->vy = std::rand() % 20 - 10;
+      is_alive = true;
+      player_protected_by_elf = nullptr;
+      // on_hit_point_changed(
+      //     new HitPointChangedEventArgs(hit_point, battle_field));
+    } else {
+      if (player_protected_by_elf != nullptr) {
+        player_protected_by_elf->hit_point = 510;
+        // player_protected_by_elf->on_hit_point_changed(
+        //     new HitPointChangedEventArgs(player_protected_by_elf->hit_point,
+        //                                  battle_field));
+      }
+    }
+  });
+  timer_of_recharge->setInterval(period_of_recharge);
+  timer_of_recharge->callOnTimeout([this]() {
+    this->hit_point = 510;
+    // OnHitPointChanged(new HitPointChangedEventArgs(HitPoint, BattleField));
+  });
 }
